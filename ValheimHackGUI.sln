@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33213.308
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ValheimHackGUI", "ValheimHackGUI.csproj", "{92B984B4-AF04-4F18-A403-9D73D40A9824}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{92B984B4-AF04-4F18-A403-9D73D40A9824}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{92B984B4-AF04-4F18-A403-9D73D40A9824}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{92B984B4-AF04-4F18-A403-9D73D40A9824}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{92B984B4-AF04-4F18-A403-9D73D40A9824}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {41F1312A-6460-4AE3-A6F0-9342F6B80621}
+	EndGlobalSection
+EndGlobal
