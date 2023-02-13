@@ -3,16 +3,30 @@ using System.Collections.Generic;
 using PlayFab.DataModels;
 using UnityEngine.UIElements;
 using System.Reflection;
+using ValheimHack;
+using Steamworks;
 
 namespace ValheimHackGUI
 {
 	class Hacks : MonoBehaviour
 	{
-        Dictionary<string, string> MobsHeight = new Dictionary<string, string>();
-        public bool isEspCharactersEnabled = false;
-		public void OnGUI()
+
+		// Player Hacks
+		PlayerHacks playerHacks = new PlayerHacks();
+        public bool isDebugFlying = false;
+		public bool infiniteStamina = false;
+		public bool infiniteStaminaOthers = false;
+        
+
+        // ESP
+        public bool EspCharacters = false;
+		public bool EspPlayers = false;
+
+        public void OnGUI()
 		{
-			if (isEspCharactersEnabled)
+			
+			DrawCommands();
+			if (EspCharacters)
 			{
 				List<Character> allCharacters = Character.GetAllCharacters();
 				foreach (Character character in allCharacters)
@@ -25,6 +39,12 @@ namespace ValheimHackGUI
 				}
 
 			}
+		}
+
+        public void DrawCommands()
+		{
+			//Rect rectangle
+			//GUI.Label()
 		}
 
         public void DrawESP(Character character)
@@ -43,10 +63,9 @@ namespace ValheimHackGUI
 
             Vector3 w2s_footpos = Camera.main.WorldToScreenPoint(playerFootPos);
 			Vector3 w2s_headpos = Camera.main.WorldToScreenPoint(playerHeadPos);
-			Debug.Log(character.m_name);
 			if (w2s_footpos.z > 5f && lastPosition != pivotPos)
 			{
-				DrawBoxESP(w2s_footpos, w2s_headpos, Color.red, true);
+				DrawBoxESP(w2s_footpos, w2s_headpos, Color.red, true); //TODO passer en argument le nom du mob et définir sa width et height dans DrawBoxESP
 				lastPosition = pivotPos;
 
             }
@@ -77,10 +96,89 @@ namespace ValheimHackGUI
 
 		public void Update()
 		{
-			if (Input.GetKeyUp(KeyCode.F1)) 
+			Debug.Log(Input.mousePosition);
+			Key_Handler();
+
+			CheckToggles();
+        }
+
+		public void Key_Handler()
+		{
+
+			//² (petit 2)
+			if (Input.GetKeyDown(KeyCode.Quote))
 			{
-				isEspCharactersEnabled = !isEspCharactersEnabled;
+                playerHacks.godMode();
+			}
+
+            //F1
+            if (Input.GetKeyDown(KeyCode.Quote))
+            {
+                playerHacks.debugFly();
+            }
+
+            // Skip F2 -> opens ingame interface
+
+            //F3
+
+            //F4
+            if (Input.GetKeyDown(KeyCode.F4))
+			{
+				infiniteStamina = !infiniteStamina;
+			}
+
+            // Skip F5 -> opens ingame console
+
+			//F6
+            if (Input.GetKeyDown(KeyCode.F6))
+			{
+				infiniteStaminaOthers = !infiniteStaminaOthers;
+			}
+
+			//F9
+            if (Input.GetKeyDown(KeyCode.F9))
+            {
+                EspCharacters = !EspCharacters;
+            }
+
+			//F10
+            if (Input.GetKeyDown(KeyCode.F10))
+            {
+                EspPlayers = !EspPlayers;
+            }
+
+
+			//Insert -> Draw help ou open menu a voir
+
+			//Delete
+            if (Input.GetKeyDown(KeyCode.Delete))
+			{
+				disableAllCheats();
+            }
+        }
+
+		public void CheckToggles()
+		{
+			if (infiniteStamina)
+			{
+				playerHacks.infiniteStamina();
+			}
+			if (infiniteStaminaOthers)
+			{
+				playerHacks.infiniteStaminaOthers();
 			}
 		}
-	}
+
+
+		public void disableAllCheats()
+		{
+			infiniteStamina = false;
+			infiniteStaminaOthers = false;
+			EspCharacters = false;
+			EspPlayers = false;
+            playerHacks.disableDebugFly();
+            playerHacks.disableGodMode();
+
+        }
+    }
 }
