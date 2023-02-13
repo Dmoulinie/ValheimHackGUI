@@ -66,27 +66,28 @@ namespace ValheimHackGUI
             float buttonWidth = 120f;
 			float buttonHeight = 30f;
 			float buttonX = 15f; // 5 -> décalage de la boite + 10 décalage intérieur
-            GUI.Box(new Rect(5, 400, 140, 326), "Les touches");
+            GUI.Box(new Rect(5, 400, 140, 386), "Les touches");
 			if (GUI.Button(new Rect(buttonX, 430, buttonWidth, buttonHeight), flyKey.ToString() +" : Fly", customButtonStyleFly))
 			{
                 toggleFly();
             }
 
-            if (GUI.Button(new Rect(buttonX, 490, buttonWidth, buttonHeight), "F3: God", customButtonStyleGodMode))
+            if (GUI.Button(new Rect(buttonX, 490, buttonWidth, buttonHeight), "F3 : God", customButtonStyleGodMode))
             {
                 toggleGodMode();
             }
-            if (GUI.Button(new Rect(buttonX, 550, buttonWidth, buttonHeight), "F4: Ghost", customButtonStyleGhostMode))
+            if (GUI.Button(new Rect(buttonX, 550, buttonWidth, buttonHeight), "F4 : Ghost", customButtonStyleGhostMode))
             {
                 toggleGhostMode();
             }
+            //TODO ajouter no placement cost sur F6 et décaler les autres
 
-            if (GUI.Button(new Rect(buttonX, 610, buttonWidth, buttonHeight), "F6: Stamina", customButtonStyleStamina))
+            if (GUI.Button(new Rect(buttonX, 610, buttonWidth, buttonHeight), "F6 : Stamina", customButtonStyleStamina))
             {
                 toggleInfiniteStamina();
             }
 
-            if (GUI.Button(new Rect(buttonX, 670, buttonWidth, buttonHeight), "F7: StaminaAll", customButtonStyleStaminaOthers))
+            if (GUI.Button(new Rect(buttonX, 670, buttonWidth, buttonHeight), "F7 : StaminaAll", customButtonStyleStaminaOthers))
             {
                 toggleInfiniteStaminaOthers();
             }
