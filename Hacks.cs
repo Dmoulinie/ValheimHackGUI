@@ -104,34 +104,57 @@ namespace ValheimHackGUI
 
 		public void Key_Handler()
 		{
+
+			//² (petit 2)
 			if (Input.GetKeyDown(KeyCode.Quote))
 			{
-                playerHacks.debugFly();
+                playerHacks.godMode();
 			}
 
-            if (Input.GetKeyDown(KeyCode.F1))
+            //F1
+            if (Input.GetKeyDown(KeyCode.Quote))
             {
-                EspPlayers = !EspPlayers;
+                playerHacks.debugFly();
             }
 
-			// Skip F2 -> opens ingame interface
+            // Skip F2 -> opens ingame interface
 
-            if (Input.GetKeyDown(KeyCode.F3))
-            {
-                EspCharacters = !EspCharacters;
-            }
+            //F3
 
-			if (Input.GetKeyDown(KeyCode.F4))
+            //F4
+            if (Input.GetKeyDown(KeyCode.F4))
 			{
 				infiniteStamina = !infiniteStamina;
 			}
 
             // Skip F5 -> opens ingame console
 
+			//F6
             if (Input.GetKeyDown(KeyCode.F6))
 			{
 				infiniteStaminaOthers = !infiniteStaminaOthers;
 			}
+
+			//F9
+            if (Input.GetKeyDown(KeyCode.F9))
+            {
+                EspCharacters = !EspCharacters;
+            }
+
+			//F10
+            if (Input.GetKeyDown(KeyCode.F10))
+            {
+                EspPlayers = !EspPlayers;
+            }
+
+
+			//Insert -> Draw help ou open menu a voir
+
+			//Delete
+            if (Input.GetKeyDown(KeyCode.Delete))
+			{
+				disableAllCheats();
+            }
         }
 
 		public void CheckToggles()
