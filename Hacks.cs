@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using PlayFab.DataModels;
 using UnityEngine.UIElements;
+using System.Reflection;
 
 namespace ValheimHackGUI
 {
 	class Hacks : MonoBehaviour
 	{
-
-		public bool isEspCharactersEnabled = false;
-			
+        Dictionary<string, string> MobsHeight = new Dictionary<string, string>();
+        public bool isEspCharactersEnabled = false;
 		public void OnGUI()
 		{
 			if (isEspCharactersEnabled)
@@ -17,10 +17,11 @@ namespace ValheimHackGUI
 				List<Character> allCharacters = Character.GetAllCharacters();
 				foreach (Character character in allCharacters)
 				{
-					if (!character.IsPlayer())
+					if (character.IsPlayer())
 					{
-                        DrawESP(character);
+						continue;
 					}
+					DrawESP(character);
 				}
 
 			}
@@ -42,7 +43,7 @@ namespace ValheimHackGUI
 
             Vector3 w2s_footpos = Camera.main.WorldToScreenPoint(playerFootPos);
 			Vector3 w2s_headpos = Camera.main.WorldToScreenPoint(playerHeadPos);
-
+			Debug.Log(character.m_name);
 			if (w2s_footpos.z > 5f && lastPosition != pivotPos)
 			{
 				DrawBoxESP(w2s_footpos, w2s_headpos, Color.red, true);
@@ -58,12 +59,12 @@ namespace ValheimHackGUI
 			float widthOffset = 2f;
 			float width = height / widthOffset;
 
-			Render.DrawBox(footpos.x - (width / 2), (float)Screen.height - footpos.y - height, width, height, color, 2f);
+			Render.DrawBox(footpos.x - (width / 2), (float)Screen.height - headpos.y - height, width, height, color, 2f);
 
 			if (lines)
 			{
 				Vector2 screenCenter = new Vector2((float)Screen.width / 2, (float)Screen.height / 2);
-				Vector2 playerPosition = new Vector2(footpos.x, (float)Screen.height - footpos.y);
+				Vector2 playerPosition = new Vector2(footpos.x, (float)Screen.height - headpos.y);
 				Render.DrawLine(screenCenter, playerPosition, color, 2f);
             }
 
