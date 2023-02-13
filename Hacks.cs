@@ -1,18 +1,34 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
-using PlayFab.DataModels;
-using UnityEngine.UIElements;
-using System.Reflection;
 using ValheimHack;
-using Steamworks;
 
 namespace ValheimHackGUI
 {
 	class Hacks : MonoBehaviour
 	{
 
-		// Player Hacks
-		PlayerHacks playerHacks = new PlayerHacks();
+        //Button Skin Test
+        GUIStyle customButtonStyleFly = new GUIStyle();
+        GUIStyle customButtonStyleGodMode = new GUIStyle();
+        GUIStyle customButtonStyleGhostMode = new GUIStyle();
+        GUIStyle customButtonStyleStamina = new GUIStyle();
+        GUIStyle customButtonStyleStaminaOthers = new GUIStyle();
+        public bool isButtonFlyPressed = false;
+		public bool isButtonGodModePressed = false;
+		public bool isButtonGhostModePressed = false;
+        //stamina utiliser variables en dessous
+
+
+        //Keycodes variables
+        KeyCode flyKey = KeyCode.F1;
+        KeyCode godKey = KeyCode.F3;
+        KeyCode ghostKey = KeyCode.F4;
+        KeyCode staminaKey = KeyCode.F6;
+        KeyCode staminaOthersKey = KeyCode.F7;
+
+
+        // Player Hacks
+        PlayerHacks playerHacks = new PlayerHacks();
         public bool isDebugFlying = false;
 		public bool infiniteStamina = false;
 		public bool infiniteStaminaOthers = false;
@@ -24,8 +40,7 @@ namespace ValheimHackGUI
 
         public void OnGUI()
 		{
-			
-			DrawCommands();
+            DrawCommands();
 			if (EspCharacters)
 			{
 				List<Character> allCharacters = Character.GetAllCharacters();
@@ -41,11 +56,41 @@ namespace ValheimHackGUI
 			}
 		}
 
+        public void Start()
+        {
+        }
+
         public void DrawCommands()
 		{
-			//Rect rectangle
-			//GUI.Label()
-		}
+            
+            float buttonWidth = 120f;
+			float buttonHeight = 30f;
+			float buttonX = 15f; // 5 -> décalage de la boite + 10 décalage intérieur
+            GUI.Box(new Rect(5, 400, 140, 326), "Les touches");
+			if (GUI.Button(new Rect(buttonX, 430, buttonWidth, buttonHeight), flyKey.ToString() +" : Fly", customButtonStyleFly))
+			{
+                toggleFly();
+            }
+
+            if (GUI.Button(new Rect(buttonX, 490, buttonWidth, buttonHeight), "F3: God", customButtonStyleGodMode))
+            {
+                toggleGodMode();
+            }
+            if (GUI.Button(new Rect(buttonX, 550, buttonWidth, buttonHeight), "F4: Ghost", customButtonStyleGhostMode))
+            {
+                toggleGhostMode();
+            }
+
+            if (GUI.Button(new Rect(buttonX, 610, buttonWidth, buttonHeight), "F6: Stamina", customButtonStyleStamina))
+            {
+                toggleInfiniteStamina();
+            }
+
+            if (GUI.Button(new Rect(buttonX, 670, buttonWidth, buttonHeight), "F7: StaminaAll", customButtonStyleStaminaOthers))
+            {
+                toggleInfiniteStaminaOthers();
+            }
+        }
 
         public void DrawESP(Character character)
 		{
@@ -89,16 +134,52 @@ namespace ValheimHackGUI
 
         }
 
-        public void Start()
-		{
 
-		}
+        public void toggleFly()
+        {
+            if (!playerHacks.debugFly())
+            {
+                isButtonFlyPressed = false;
+                return;
+            }
+            isButtonFlyPressed = true;
 
-		public void Update()
+        }
+
+        public void toggleGodMode()
+        {
+            if (!playerHacks.godMode())
+            {
+                isButtonGodModePressed = false;
+                return;
+            }
+            isButtonGodModePressed = true;
+        }
+
+        public void toggleGhostMode()
+        {
+            if (!playerHacks.ghostMode())
+            {
+                isButtonGhostModePressed = false;
+                return;
+            }
+            isButtonGhostModePressed = true;
+        }
+
+        public void toggleInfiniteStamina()
+        {
+            infiniteStamina = !infiniteStamina;
+        }
+
+        public void toggleInfiniteStaminaOthers()
+        {
+            infiniteStaminaOthers = !infiniteStaminaOthers;
+
+        }
+
+        public void Update()
 		{
-			Debug.Log(Input.mousePosition);
 			Key_Handler();
-
 			CheckToggles();
         }
 
@@ -106,36 +187,45 @@ namespace ValheimHackGUI
 		{
 
 			//² (petit 2)
-			if (Input.GetKeyDown(KeyCode.Quote))
-			{
-                playerHacks.godMode();
-			}
+
 
             //F1
-            if (Input.GetKeyDown(KeyCode.Quote))
+            if (Input.GetKeyDown(flyKey))
             {
-                playerHacks.debugFly();
+                toggleFly();
             }
 
             // Skip F2 -> opens ingame interface
 
             //F3
+            if (Input.GetKeyDown(ghostKey))
+            {
+                toggleGhostMode();
+            }
 
             //F4
-            if (Input.GetKeyDown(KeyCode.F4))
-			{
-				infiniteStamina = !infiniteStamina;
-			}
+            if (Input.GetKeyDown(godKey))
+            {
+                toggleGodMode();
+            }
 
             // Skip F5 -> opens ingame console
 
-			//F6
-            if (Input.GetKeyDown(KeyCode.F6))
-			{
-				infiniteStaminaOthers = !infiniteStaminaOthers;
-			}
+            //F6
+            if (Input.GetKeyDown(staminaKey))
+            {
+                toggleInfiniteStamina();
 
-			//F9
+            }
+
+            //F7
+            if (Input.GetKeyDown(staminaOthersKey))
+            {
+                toggleInfiniteStaminaOthers();
+
+            }
+
+            //F9
             if (Input.GetKeyDown(KeyCode.F9))
             {
                 EspCharacters = !EspCharacters;
@@ -162,22 +252,91 @@ namespace ValheimHackGUI
 			if (infiniteStamina)
 			{
 				playerHacks.infiniteStamina();
-			}
+                make_button_style(customButtonStyleStamina, new Color(0f, 0.8f, 0f, 0.5f));
+			} else
+            {
+                make_button_style(customButtonStyleStamina, new Color(0.8f, 0f, 0f, 0.5f));
+            }
 			if (infiniteStaminaOthers)
 			{
 				playerHacks.infiniteStaminaOthers();
-			}
-		}
+                make_button_style(customButtonStyleStaminaOthers, new Color(0f, 0.8f, 0f, 0.5f));
+            } else
+            {
+                make_button_style(customButtonStyleStaminaOthers, new Color(0.8f, 0f, 0f, 0.5f));
+            }
 
 
-		public void disableAllCheats()
+            if (isButtonFlyPressed) { make_button_style(customButtonStyleFly, new Color(0f,0.8f,0f,0.5f)); }
+            else                    { make_button_style(customButtonStyleFly, new Color(0.8f, 0f, 0f, 0.5f)); }
+
+            if (isButtonGodModePressed) { make_button_style(customButtonStyleGodMode, new Color(0f, 0.8f, 0f, 0.5f)); }
+            else                        { make_button_style(customButtonStyleGodMode, new Color(0.8f, 0f, 0f, 0.5f)); }
+
+            if (isButtonGhostModePressed) { make_button_style(customButtonStyleGhostMode, new Color(0f, 0.8f, 0f, 0.5f)); }
+            else { make_button_style(customButtonStyleGhostMode, new Color(0.8f, 0f, 0f, 0.5f)); }
+        }
+
+        //buttons save
+        public void make_button_style2(GUIStyle style, Color color)
+        {
+            style.normal.background = new Texture2D(1, 1);
+            Color[] pixels = style.normal.background.GetPixels();
+            for (int i = 0; i < pixels.Length; i++)
+            {
+                pixels[i] = color;
+            }
+            style.normal.background.SetPixels(pixels);
+            style.normal.background.Apply();
+            style.normal.textColor = Color.white;
+            style.alignment = TextAnchor.MiddleCenter;
+
+        }
+
+        //Buttons
+        public void make_button_style(GUIStyle style, Color color)
+        {
+
+            // Create a custom Texture2D with black borders
+            Texture2D blackBordersTexture = new Texture2D(200, 50);
+            Color[] pixels = new Color[200 * 50];
+            for (int x = 0; x < blackBordersTexture.width; x++)
+            {
+                for (int y = 0; y < blackBordersTexture.height; y++)
+                {
+                    if (x == 0 || x == blackBordersTexture.width - 1 || y == 0 || y == blackBordersTexture.height - 1)
+                    {
+                        pixels[x + y * blackBordersTexture.width] = Color.black;
+                    }
+                    else
+                    {
+                        pixels[x + y * blackBordersTexture.width] = color;
+                    }
+                }
+            }
+            blackBordersTexture.SetPixels(pixels);
+            blackBordersTexture.Apply();
+
+            style.normal.background = blackBordersTexture;
+            style.normal.textColor = Color.white;
+            style.fontSize = 16;
+            style.alignment = TextAnchor.MiddleCenter;
+
+        }
+
+
+        public void disableAllCheats()
 		{
 			infiniteStamina = false;
 			infiniteStaminaOthers = false;
 			EspCharacters = false;
 			EspPlayers = false;
             playerHacks.disableDebugFly();
+            isButtonFlyPressed = false;
             playerHacks.disableGodMode();
+            isButtonGodModePressed = false;
+            playerHacks.disableGhostMode();
+            isButtonGhostModePressed = false;
 
         }
     }

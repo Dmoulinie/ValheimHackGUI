@@ -1,32 +1,44 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
-
+using ValheimHackGUI;
 
 namespace ValheimHack
 {
     internal class PlayerHacks
     {
-
-        public void debugFly()
+        public bool debugFly()
         {
             Player localplayer = Player.m_localPlayer;
             if (localplayer == null)
             {
-                return;
+                return false;
             }
-            localplayer.ToggleDebugFly();
+            return localplayer.ToggleDebugFly();
+            
         }
 
 
-        public void godMode()
+        public bool godMode()
         {
             Player localplayer = Player.m_localPlayer;
             if (localplayer == null)
             {
-                return;
+                return false;
             }
             localplayer.SetGodMode(!localplayer.InGodMode());
+            return localplayer.InGodMode();
+        }
+
+        public bool ghostMode()
+        {
+            Player localplayer = Player.m_localPlayer;
+            if (localplayer == null)
+            {
+                return false;
+            }
+            localplayer.SetGhostMode(!localplayer.InGhostMode());
+            return localplayer.InGhostMode();
         }
 
         public void infiniteStamina()
@@ -80,6 +92,20 @@ namespace ValheimHack
                 return;
             }
             localplayer.SetGodMode(false);
+        }
+
+        public void disableGhostMode()
+        {
+            Player localplayer = Player.m_localPlayer;
+            if (localplayer == null)
+            {
+                return;
+            }
+            if (!localplayer.InGhostMode())
+            {
+                return;
+            }
+            localplayer.SetGhostMode(false);
         }
 
     }
