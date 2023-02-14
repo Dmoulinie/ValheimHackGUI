@@ -95,6 +95,12 @@ namespace ValheimHackGUI
 
         public void DrawESP(Character character)
 		{
+            List<string> mobsToDraw = new List<string>();
+            mobsToDraw.Add("$enemy_greydwarf");
+            if (!mobsToDraw.Contains(character.m_name))
+            {
+                return;
+            }
 			Vector3 lastPosition = Vector3.zero;
 			Vector3 pivotPos = character.transform.position;
             Vector3 playerFootPos;
@@ -111,6 +117,12 @@ namespace ValheimHackGUI
 			Vector3 w2s_headpos = Camera.main.WorldToScreenPoint(playerHeadPos);
 			if (w2s_footpos.z > 5f && lastPosition != pivotPos)
 			{
+
+
+                //Debug taille personnage
+                Debug.Log("m_name : " + character.m_name);
+
+                    
 				DrawBoxESP(w2s_footpos, w2s_headpos, Color.red, true); //TODO passer en argument le nom du mob et définir sa width et height dans DrawBoxESP
 				lastPosition = pivotPos;
 
@@ -120,6 +132,8 @@ namespace ValheimHackGUI
 
 		public void DrawBoxESP(Vector3 footpos, Vector3 headpos, Color color, bool lines)
 		{
+            Player localplayer = Player.m_localPlayer;
+            Vector3 localplayerPosition = localplayer.transform.position;
 			float height = footpos.y - headpos.y;
 			float widthOffset = 2f;
 			float width = height / widthOffset;
@@ -130,7 +144,14 @@ namespace ValheimHackGUI
 			{
 				Vector2 screenCenter = new Vector2((float)Screen.width / 2, (float)Screen.height / 2);
 				Vector2 playerPosition = new Vector2(footpos.x, (float)Screen.height - headpos.y);
+
+
+                //Debug lines
+                Vector2 playerPositionhead = new Vector2(footpos.x, (float)Screen.height - headpos.y);
+                Vector2 playerPositionFoot = new Vector2(footpos.x, (float)Screen.height - footpos.y);
+                Debug.Log("Distance to mob : " + Vector3.Distance(footpos,localplayerPosition));
 				Render.DrawLine(screenCenter, playerPosition, color, 2f);
+				Render.DrawLine(playerPositionhead, playerPositionFoot, Color.green, 2f);
             }
 
         }
@@ -144,7 +165,7 @@ namespace ValheimHackGUI
                 return;
             }
             isButtonFlyPressed = true;
-
+            
         }
 
         public void toggleGodMode()
