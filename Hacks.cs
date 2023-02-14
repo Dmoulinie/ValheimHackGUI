@@ -120,7 +120,7 @@ namespace ValheimHackGUI
 
 
                 //Debug taille personnage
-                Debug.Log("m_name : " + character.m_name);
+                Debug.Log("m_name : " + character.m_name)   ;
 
                     
 				DrawBoxESP(w2s_footpos, w2s_headpos, Color.red, true); //TODO passer en argument le nom du mob et définir sa width et height dans DrawBoxESP
@@ -137,8 +137,9 @@ namespace ValheimHackGUI
 			float height = footpos.y - headpos.y;
 			float widthOffset = 2f;
 			float width = height / widthOffset;
-
-			Render.DrawBox(footpos.x - (width / 2), (float)Screen.height - headpos.y - height, width, height, color, 2f);
+            Debug.Log("Distance to mob : " + Vector3.Distance(footpos, localplayerPosition));
+            float distanceToMob = Vector3.Distance(footpos, localplayerPosition);
+            Render.DrawBox(footpos.x - (width / 2), (float)Screen.height - headpos.y - height, width, height / distanceToMob, color, 2f);
 
 			if (lines)
 			{
@@ -149,7 +150,6 @@ namespace ValheimHackGUI
                 //Debug lines
                 Vector2 playerPositionhead = new Vector2(footpos.x, (float)Screen.height - headpos.y);
                 Vector2 playerPositionFoot = new Vector2(footpos.x, (float)Screen.height - footpos.y);
-                Debug.Log("Distance to mob : " + Vector3.Distance(footpos,localplayerPosition));
 				Render.DrawLine(screenCenter, playerPosition, color, 2f);
 				Render.DrawLine(playerPositionhead, playerPositionFoot, Color.green, 2f);
             }
