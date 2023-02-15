@@ -45,7 +45,7 @@ namespace ValheimHackGUI
         public bool isDebugFlying = false;
 		public bool infiniteStamina = false;
 		public bool infiniteStaminaOthers = false;
-
+        public bool fly = false;
 
         // ESP General
         ESP esp = new ESP();
@@ -56,11 +56,17 @@ namespace ValheimHackGUI
         public bool charactersLines = false;
         public bool charactersDistance = false;
         public bool charactersHealth = false;
+        float characterDrawRange = 150f;
 
+
+
+
+        //Misc
+        public bool helpCommands = true;
 
 
         //ESP players
-		public bool EspPlayers = false;
+        public bool EspPlayers = false;
 
         // Main Menu
         public bool cheatMenu = false;
@@ -80,7 +86,10 @@ namespace ValheimHackGUI
                 mainMenu();
             }
 
-            DrawCommands();
+            if (helpCommands)
+            {
+                DrawCommands();
+            }
 			if (EspCharacters)
 			{
 				List<Character> allCharacters = Character.GetAllCharacters();
@@ -92,7 +101,7 @@ namespace ValheimHackGUI
                     }
                     if (!character.IsPlayer() && EspCharacters)
                     {
-                        esp.DrawESPCharacters(character, Color.red, charactersDistance, charactersName, charactersLines, charactersHealth); //carrée rouge
+                        esp.DrawESPCharacters(character, Color.red, charactersDistance, charactersName, charactersLines, charactersHealth, characterDrawRange); //carrée rouge
                     }
 
 				}
@@ -163,11 +172,30 @@ namespace ValheimHackGUI
                 charactersName = GUI.Toggle(new Rect(5, firstOption + 30, 200, 15),charactersName,"Name");
                 charactersDistance = GUI.Toggle(new Rect(5, firstOption + 60, 200, 15), charactersDistance, "Distance");
                 charactersLines = GUI.Toggle(new Rect(5, firstOption + 90, 200, 15), charactersLines, "Lines");
-                charactersHealth = GUI.Toggle(new Rect(5, firstOption + 120, 200, 15), charactersHealth, "Health (WIP)");
-
+                charactersHealth = GUI.Toggle(new Rect(5, firstOption + 120, 200, 20), charactersHealth, "Health");
+                GUI.Label(new Rect(5, firstOption + 145, 200, 25),"Distance : " + (int)characterDrawRange + "m");
+                characterDrawRange = GUI.HorizontalSlider(new Rect(5, firstOption + 170, 190, 15), characterDrawRange, 15, 150);
 
                 //Joueurs
                 GUI.Box(new Rect(200, 50, 200, 250), "Joueurs");
+            }
+            if (playerhacksTab)
+            {
+
+                float firstOption = 70f;
+                GUI.Box(new Rect(000, 50, 200, 250), "Player");
+                fly = GUI.Toggle(new Rect(5, firstOption, 200, 20),fly,"Fly");
+                GUI.Box(new Rect(200, 50, 200, 250), "Others");
+
+            }
+            if (teleportTab)
+            {
+                //return;
+            }
+            if (miscTab)
+            {
+                float firstOption = 70f;
+                helpCommands = GUI.Toggle(new Rect(5, firstOption, 200, 20), helpCommands, "Help keys");
             }
 
             // We need to match all BeginGroup calls with an EndGroup
@@ -387,6 +415,7 @@ namespace ValheimHackGUI
                     buttonColorStamina = false;
                 } 
             }
+
 			if (infiniteStaminaOthers)
 			{
 				playerHacks.infiniteStaminaOthers();
@@ -403,7 +432,6 @@ namespace ValheimHackGUI
                     buttonColorStaminaOthers = false;
                 }
             }
-
 
             if (isButtonFlyPressed)
             {

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace ValheimHackGUI
 {
@@ -11,7 +6,7 @@ namespace ValheimHackGUI
     {
 
         //-------------------------------------------------------Characters-------------------------------------------------------//
-        public void DrawESPCharacters(Character character, Color colorBox, bool charactersDistance, bool charactersName, bool charactersLines, bool charactersHealth)
+        public void DrawESPCharacters(Character character, Color colorBox, bool charactersDistance, bool charactersName, bool charactersLines, bool charactersHealth, float characterDrawRange)
         {
 
             //List<string> mobsToDraw = new List<string>();
@@ -38,7 +33,7 @@ namespace ValheimHackGUI
             int distanceToMob = (int)Vector3.Distance(pivotPos, localplayerPosition);
             Vector3 w2s_footpos = Camera.main.WorldToScreenPoint(playerFootPos);
             Vector3 w2s_headpos = Camera.main.WorldToScreenPoint(playerHeadPos);
-            if (w2s_footpos.z > 5f && lastPosition != pivotPos)
+            if (w2s_footpos.z > 5f && lastPosition != pivotPos && distanceToMob < characterDrawRange)
             {
 
                 DrawBoxESPCharacters(w2s_footpos, w2s_headpos, colorBox, distanceToMob.ToString(), character.GetHoverName(), charactersDistance, charactersName, charactersLines, charactersHealth, character.GetHealth(), character.GetMaxHealth()); //TODO passer en argument le nom du mob et définir sa width et height dans DrawBoxESP
@@ -56,7 +51,8 @@ namespace ValheimHackGUI
             Render.DrawBox(footpos.x - (width / 2), (float)Screen.height - headpos.y - height, width, height, color, 2f);
             if (charactersDistance)
             {
-                Render.DrawString(new Vector2(headpos.x, (float)Screen.height - headpos.y + 10f), distanceToMob.ToString() + "m", true); // Distance to mob
+                float offsetDistanceDrawing = 20f;
+                Render.DrawString(new Vector2(headpos.x - (width/2) + offsetDistanceDrawing, (float)Screen.height - headpos.y + 10f), distanceToMob + "m", true); // Distance to mob
             }
             if (charactersName)
             {
@@ -71,7 +67,8 @@ namespace ValheimHackGUI
             }
             if (charactersHealth && health != 0 && maxHealth != 0)
             {
-                Render.DrawString(new Vector2(headpos.x + (width/2) +15f, (float)Screen.height - headpos.y + 10f), health + "/" + maxHealth);
+                float offsetHealthDrawing = 20f;
+                Render.DrawString(new Vector2(headpos.x + (width/2) - offsetHealthDrawing, (float)Screen.height - headpos.y + 10f), health + "/" + maxHealth);
             }
 
         }
