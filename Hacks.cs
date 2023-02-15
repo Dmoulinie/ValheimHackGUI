@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using ValheimHack;
+using System.Security.Policy;
 
 namespace ValheimHackGUI
 {
@@ -17,6 +18,13 @@ namespace ValheimHackGUI
 		public bool isButtonGodModePressed = false;
 		public bool isButtonGhostModePressed = false;
         //stamina utiliser variables en dessous
+
+        // couleurs on/off bouttons -> fix memory leak
+        public bool buttonColorStamina = false; // true = green | false = red
+        public bool buttonColorStaminaOthers = false;
+        public bool buttonColorFly = false;
+        public bool buttonColorGod = false;
+        public bool buttonColorGhost = false;
 
 
         //Keycodes variables
@@ -58,6 +66,12 @@ namespace ValheimHackGUI
 
         public void Start()
         {
+            make_button_style(customButtonStyleStamina, new Color(0.8f, 0f, 0f, 0.5f)); // set stamina button red
+            make_button_style(customButtonStyleStaminaOthers, new Color(0.8f, 0f, 0f, 0.5f)); // set stamina button red
+            make_button_style(customButtonStyleFly, new Color(0.8f, 0f, 0f, 0.5f)); // set stamina button red
+            make_button_style(customButtonStyleGodMode, new Color(0.8f, 0f, 0f, 0.5f)); // set stamina button red
+            make_button_style(customButtonStyleGhostMode, new Color(0.8f, 0f, 0f, 0.5f)); // set stamina button red
+
         }
 
         public void DrawCommands()
@@ -96,12 +110,15 @@ namespace ValheimHackGUI
         public void DrawESP(Character character)
 		{
             List<string> mobsToDraw = new List<string>();
-            mobsToDraw.Add("$enemy_greydwarf");
-            if (!mobsToDraw.Contains(character.m_name))
-            {
-                return;
-            }
-			Vector3 lastPosition = Vector3.zero;
+            //mobsToDraw.Add("$enemy_greydwarf");
+            //if (!mobsToDraw.Contains(character.m_name))
+            //{
+            //    return;
+            //}
+            Player localplayer = Player.m_localPlayer;
+            Vector3 localplayerPosition = localplayer.transform.position;
+
+            Vector3 lastPosition = Vector3.zero;
 			Vector3 pivotPos = character.transform.position;
             Vector3 playerFootPos;
 			playerFootPos.x = pivotPos.x;
@@ -111,7 +128,7 @@ namespace ValheimHackGUI
 			playerHeadPos.x = pivotPos.x;
 			playerHeadPos.y = pivotPos.y + 4f;
 			playerHeadPos.z = pivotPos.z;
-
+            int distanceToMob = (int)Vector3.Distance(pivotPos, localplayerPosition);
 
             Vector3 w2s_footpos = Camera.main.WorldToScreenPoint(playerFootPos);
 			Vector3 w2s_headpos = Camera.main.WorldToScreenPoint(playerHeadPos);
@@ -119,29 +136,24 @@ namespace ValheimHackGUI
 			{
 
 
-                //Debug taille personnage
-                Debug.Log("m_name : " + character.m_name)   ;
-
+                string nameMob = character.name.Replace("(Clone)", "");
                     
-				DrawBoxESP(w2s_footpos, w2s_headpos, Color.red, true); //TODO passer en argument le nom du mob et définir sa width et height dans DrawBoxESP
+				DrawBoxESP(w2s_footpos, w2s_headpos, Color.red, distanceToMob.ToString(), nameMob, true); //TODO passer en argument le nom du mob et définir sa width et height dans DrawBoxESP
 				lastPosition = pivotPos;
 
             }
 
         }
 
-		public void DrawBoxESP(Vector3 footpos, Vector3 headpos, Color color, bool lines)
+		public void DrawBoxESP(Vector3 footpos, Vector3 headpos, Color color, string distanceToMob, string nameMob,bool lines)
 		{
-            Player localplayer = Player.m_localPlayer;
-            Vector3 localplayerPosition = localplayer.transform.position;
 			float height = footpos.y - headpos.y;
 			float widthOffset = 2f;
 			float width = height / widthOffset;
-            Debug.Log("Distance to mob : " + Vector3.Distance(footpos, localplayerPosition));
-            float distanceToMob = Vector3.Distance(footpos, localplayerPosition);
-            Render.DrawBox(footpos.x - (width / 2), (float)Screen.height - headpos.y - height, width, height / distanceToMob, color, 2f);
-
-			if (lines)
+            Render.DrawBox(footpos.x - (width / 2), (float)Screen.height - headpos.y - height, width, height , color, 2f);
+            Render.DrawString(new Vector2(headpos.x, (float)Screen.height - headpos.y + 10f), distanceToMob.ToString() + "m", true); // Distance to mob
+            Render.DrawString(new Vector2(headpos.x, (float)Screen.height - headpos.y -20f),  nameMob, true); // Name of mob
+            if (lines)
 			{
 				Vector2 screenCenter = new Vector2((float)Screen.width / 2, (float)Screen.height / 2);
 				Vector2 playerPosition = new Vector2(footpos.x, (float)Screen.height - headpos.y);
@@ -151,7 +163,7 @@ namespace ValheimHackGUI
                 Vector2 playerPositionhead = new Vector2(footpos.x, (float)Screen.height - headpos.y);
                 Vector2 playerPositionFoot = new Vector2(footpos.x, (float)Screen.height - footpos.y);
 				Render.DrawLine(screenCenter, playerPosition, color, 2f);
-				Render.DrawLine(playerPositionhead, playerPositionFoot, Color.green, 2f);
+				//Render.DrawLine(playerPositionhead, playerPositionFoot, Color.green, 2f);
             }
 
         }
@@ -269,34 +281,98 @@ namespace ValheimHackGUI
             }
         }
 
-		public void CheckToggles()
+
+
+        public void CheckToggles()
 		{
 			if (infiniteStamina)
 			{
 				playerHacks.infiniteStamina();
-                make_button_style(customButtonStyleStamina, new Color(0f, 0.8f, 0f, 0.5f));
+                if(!buttonColorStamina) // if button red
+                { 
+                    make_button_style(customButtonStyleStamina, new Color(0f, 0.8f, 0f, 0.5f)); // set stamina button green
+                    buttonColorStamina = true;
+                } 
 			} else
             {
-                make_button_style(customButtonStyleStamina, new Color(0.8f, 0f, 0f, 0.5f));
+                if (buttonColorStamina) // if button green
+                { 
+                    make_button_style(customButtonStyleStamina, new Color(0.8f, 0f, 0f, 0.5f)); // set stamina button red
+                    buttonColorStamina = false;
+                } 
             }
 			if (infiniteStaminaOthers)
 			{
 				playerHacks.infiniteStaminaOthers();
-                make_button_style(customButtonStyleStaminaOthers, new Color(0f, 0.8f, 0f, 0.5f));
+                if (!buttonColorStaminaOthers) // if button red
+                {
+                    make_button_style(customButtonStyleStaminaOthers, new Color(0f, 0.8f, 0f, 0.5f)); // set staminaOthers button green
+                    buttonColorStaminaOthers = true;
+                }
             } else
             {
-                make_button_style(customButtonStyleStaminaOthers, new Color(0.8f, 0f, 0f, 0.5f));
+                if (buttonColorStaminaOthers) // if button green
+                {
+                    make_button_style(customButtonStyleStaminaOthers, new Color(0.8f, 0f, 0f, 0.5f));// set staminaOthers button red
+                    buttonColorStaminaOthers = false;
+                }
             }
 
 
-            if (isButtonFlyPressed) { make_button_style(customButtonStyleFly, new Color(0f,0.8f,0f,0.5f)); }
-            else                    { make_button_style(customButtonStyleFly, new Color(0.8f, 0f, 0f, 0.5f)); }
+            if (isButtonFlyPressed)
+            {
+                if (!buttonColorFly) // if button red
+                {
+                    make_button_style(customButtonStyleFly, new Color(0f, 0.8f, 0f, 0.5f)); // set fly button green
+                    buttonColorFly = true;
+                }
+            }
+            else
+            {
+                if (buttonColorFly) // if button green
+                {
+                    make_button_style(customButtonStyleFly, new Color(0.8f, 0f, 0f, 0.5f)); // set fly button red
+                    buttonColorFly = false;
 
-            if (isButtonGodModePressed) { make_button_style(customButtonStyleGodMode, new Color(0f, 0.8f, 0f, 0.5f)); }
-            else                        { make_button_style(customButtonStyleGodMode, new Color(0.8f, 0f, 0f, 0.5f)); }
+                }
+            }
 
-            if (isButtonGhostModePressed) { make_button_style(customButtonStyleGhostMode, new Color(0f, 0.8f, 0f, 0.5f)); }
-            else { make_button_style(customButtonStyleGhostMode, new Color(0.8f, 0f, 0f, 0.5f)); }
+            if (isButtonGodModePressed) 
+            {
+                if (!buttonColorGod) // if button red
+                {
+                    make_button_style(customButtonStyleGodMode, new Color(0f, 0.8f, 0f, 0.5f)); // set god button green
+                    buttonColorGod = true;
+
+                }
+            }
+            else                       
+            {
+                if (buttonColorGod) // if button green
+                {
+                    make_button_style(customButtonStyleGodMode, new Color(0.8f, 0f, 0f, 0.5f)); // set god button red
+                    buttonColorGod = false;
+                }
+            }
+
+            if (isButtonGhostModePressed) 
+            {
+                if (!buttonColorGhost) // if button red
+                {
+
+                    make_button_style(customButtonStyleGhostMode, new Color(0f, 0.8f, 0f, 0.5f)); // set ghost button green
+                    buttonColorGhost = true;
+                }
+            }
+            else 
+            {
+                if (buttonColorGhost) // if button green
+                {
+                    make_button_style(customButtonStyleGhostMode, new Color(0.8f, 0f, 0f, 0.5f)); // set ghost button red
+                    buttonColorGhost = false;
+
+                }
+            }
         }
 
         //buttons save
@@ -359,7 +435,13 @@ namespace ValheimHackGUI
             isButtonGodModePressed = false;
             playerHacks.disableGhostMode();
             isButtonGhostModePressed = false;
+            //Make all buttons colors red
+            buttonColorStamina = false; 
+            buttonColorStaminaOthers = false;
+            buttonColorFly = false;
+            buttonColorGod = false;
+            buttonColorGhost = false;
 
-        }
+    }
     }
 }
