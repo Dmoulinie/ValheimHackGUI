@@ -34,6 +34,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="ESP.cs" />
     <Compile Include="Hacks.cs" />
     <Compile Include="Loader.cs" />
     <Compile Include="PlayerHacks.cs" />

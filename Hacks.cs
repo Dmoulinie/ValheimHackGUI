@@ -27,6 +27,11 @@ namespace ValheimHackGUI
         public bool buttonColorGhost = false;
 
 
+        //Lines
+        public bool linesMobs = false;
+        public bool linesPlayers = false;
+
+
         //Keycodes variables
         KeyCode flyKey = KeyCode.F1;
         KeyCode godKey = KeyCode.F3;
@@ -40,29 +45,158 @@ namespace ValheimHackGUI
         public bool isDebugFlying = false;
 		public bool infiniteStamina = false;
 		public bool infiniteStaminaOthers = false;
-        
 
-        // ESP
+
+        // ESP characters 
         public bool EspCharacters = false;
+        public bool charactersName = false;
+        public bool charactersLines = false;
+        public bool charactersDistance = false;
+        public bool charactersHealth = false;
+
+
+
+        //ESP players
 		public bool EspPlayers = false;
+
+        // Main Menu
+        public bool cheatMenu = false;
+
+        // Main Menu Tabs
+        public bool wallhackTab = true;
+        public bool playerhacksTab = false;
+        public bool teleportTab = false;
+        public bool miscTab = false;
 
         public void OnGUI()
 		{
+            GUI.Label(new Rect(0, 0, 110, 20), "Pano Menu"); // Watermark
+
+            if (cheatMenu)
+            {
+                mainMenu();
+            }
+
             DrawCommands();
 			if (EspCharacters)
 			{
 				List<Character> allCharacters = Character.GetAllCharacters();
 				foreach (Character character in allCharacters)
 				{
-					if (character.IsPlayer())
-					{
-						continue;
-					}
-					DrawESP(character);
+                    if (character.IsPlayer() && !EspPlayers) // Check si ESP joueur activé
+                    {
+                        continue;
+                    }
+                    if (!character.IsPlayer() && EspCharacters)
+                    {
+					    DrawESP(character, Color.red); //carrée rouge
+                    }
+
 				}
 
 			}
+            if (EspPlayers)
+            {
+                List<Player> allPlayers = Player.GetAllPlayers();
+                foreach (Player player in allPlayers)
+                {
+                    if (player == Player.m_localPlayer)
+                    {
+                        continue;
+                    }
+                    if (player.IsPVPEnabled())
+                    {
+                        DrawESPPlayer(player, new Color(1,0.65f,0)); //carrée orange
+                    } else
+                    {
+                        DrawESPPlayer(player, Color.green); //carrée vert
+                    }
+
+                }
+            }
 		}
+
+        public void mainMenu()
+        {
+            GUI.BeginGroup(new Rect(300, 400, 400, 300)); // x = largeur écran /2 - moitié fenetre | y = hauteur écran /2 - moitié fenetre = placement au centre
+            // Draw a box in the new coordinate space defined by the BeginGroup.
+            // Notice how (0,0) has now been moved on-screen
+            GUI.Box(new Rect(0, 0, 400, 300), "Pano Cheat");
+
+
+
+            //---------------------TABS---------------------//
+            if (GUI.Button(new Rect(000, 20, 100, 30), "Wallhack"))
+            {
+                wallhackTab = true;
+                disableAllTabsExcept("wallhackTab");
+            }
+            if(GUI.Button(new Rect(100, 20, 100, 30), "Player Hacks"))
+            {
+                playerhacksTab = true;
+                disableAllTabsExcept("playerhacksTab");
+
+            }
+            if (GUI.Button(new Rect(200, 20, 100, 30), "Teleport"))
+            {
+                teleportTab = true;
+                disableAllTabsExcept("teleportTab");
+            }
+            if(GUI.Button(new Rect(300, 20, 100, 30), "Miscellaneous"))
+            {
+                miscTab = true;
+                disableAllTabsExcept("miscTab");
+
+            }
+
+
+            if (wallhackTab)
+            {
+                //Monstres  ---- add 30 to "y" rect for each option
+                GUI.Box(new Rect(000, 50, 200, 250), "Monstres");
+                float firstOption = 70f;
+                EspCharacters = GUI.Toggle(new Rect(5, firstOption, 200, 15), EspCharacters, "Activate"); 
+                charactersName = GUI.Toggle(new Rect(5, firstOption + 30, 200, 15),charactersName,"Name");
+                charactersDistance = GUI.Toggle(new Rect(5, firstOption + 60, 200, 15), charactersDistance, "Distance");
+                charactersLines = GUI.Toggle(new Rect(5, firstOption + 90, 200, 15), charactersLines, "Lines");
+                charactersHealth = GUI.Toggle(new Rect(5, firstOption + 120, 200, 15), charactersHealth, "Health (WIP)");
+
+
+                //Joueurs
+                GUI.Box(new Rect(200, 50, 200, 250), "Joueurs");
+            }
+
+            // We need to match all BeginGroup calls with an EndGroup
+            GUI.EndGroup();
+        }
+
+        public void disableAllTabsExcept(string tab)
+        {
+            switch (tab)
+            {
+                case "wallhackTab":
+                    playerhacksTab = false;
+                    teleportTab = false;
+                    miscTab = false;
+                    break;
+                case "playerhacksTab":
+                    wallhackTab = false;
+                    teleportTab = false;
+                    miscTab = false;
+                    break;
+                case "teleportTab":
+                    wallhackTab = false;
+                    playerhacksTab = false;
+                    miscTab = false;
+                    break;
+                case "miscTab":
+                    wallhackTab = false;
+                    playerhacksTab = false;
+                    teleportTab = false;
+                    break;
+  
+            }
+        }
 
         public void Start()
         {
@@ -81,41 +215,43 @@ namespace ValheimHackGUI
 			float buttonHeight = 30f;
 			float buttonX = 15f; // 5 -> décalage de la boite + 10 décalage intérieur
             GUI.Box(new Rect(5, 400, 140, 386), "Les touches");
-			if (GUI.Button(new Rect(buttonX, 430, buttonWidth, buttonHeight), flyKey.ToString() +" : Fly", customButtonStyleFly))
+			if (GUI.Button(new Rect(buttonX, 430, buttonWidth, buttonHeight), flyKey.ToString() + " : Fly", customButtonStyleFly))
 			{
                 toggleFly();
             }
 
-            if (GUI.Button(new Rect(buttonX, 490, buttonWidth, buttonHeight), "F3 : God", customButtonStyleGodMode))
+            if (GUI.Button(new Rect(buttonX, 490, buttonWidth, buttonHeight), godKey.ToString() + " : God", customButtonStyleGodMode))
             {
                 toggleGodMode();
             }
-            if (GUI.Button(new Rect(buttonX, 550, buttonWidth, buttonHeight), "F4 : Ghost", customButtonStyleGhostMode))
+            if (GUI.Button(new Rect(buttonX, 550, buttonWidth, buttonHeight), ghostKey.ToString() + " : Ghost", customButtonStyleGhostMode))
             {
                 toggleGhostMode();
             }
             //TODO ajouter no placement cost sur F6 et décaler les autres
 
-            if (GUI.Button(new Rect(buttonX, 610, buttonWidth, buttonHeight), "F6 : Stamina", customButtonStyleStamina))
+            if (GUI.Button(new Rect(buttonX, 610, buttonWidth, buttonHeight), staminaKey.ToString() + " : Stamina", customButtonStyleStamina))
             {
                 toggleInfiniteStamina();
             }
 
-            if (GUI.Button(new Rect(buttonX, 670, buttonWidth, buttonHeight), "F7 : StaminaAll", customButtonStyleStaminaOthers))
+            if (GUI.Button(new Rect(buttonX, 670, buttonWidth, buttonHeight), staminaOthersKey.ToString() + " : StaminaAll", customButtonStyleStaminaOthers))
             {
                 toggleInfiniteStaminaOthers();
             }
         }
 
-        public void DrawESP(Character character)
+        public void DrawESP(Character character, Color colorBox)
 		{
-            List<string> mobsToDraw = new List<string>();
+            
+            //List<string> mobsToDraw = new List<string>();
             //mobsToDraw.Add("$enemy_greydwarf");
             //if (!mobsToDraw.Contains(character.m_name))
             //{
             //    return;
             //}
             Player localplayer = Player.m_localPlayer;
+            string mobName = character.GetHoverName();
             Vector3 localplayerPosition = localplayer.transform.position;
 
             Vector3 lastPosition = Vector3.zero;
@@ -135,35 +271,86 @@ namespace ValheimHackGUI
 			if (w2s_footpos.z > 5f && lastPosition != pivotPos)
 			{
 
-
-                string nameMob = character.name.Replace("(Clone)", "");
-                    
-				DrawBoxESP(w2s_footpos, w2s_headpos, Color.red, distanceToMob.ToString(), nameMob, true); //TODO passer en argument le nom du mob et définir sa width et height dans DrawBoxESP
+                DrawBoxESPCharacters(w2s_footpos, w2s_headpos, colorBox, distanceToMob.ToString(), mobName, linesMobs); //TODO passer en argument le nom du mob et définir sa width et height dans DrawBoxESP
 				lastPosition = pivotPos;
 
             }
 
         }
+        public void DrawESPPlayer(Player player, Color colorBox)
+        {
+            Player localplayer = Player.m_localPlayer;
 
-		public void DrawBoxESP(Vector3 footpos, Vector3 headpos, Color color, string distanceToMob, string nameMob,bool lines)
+            Vector3 localplayerPosition = localplayer.transform.position;
+
+            Vector3 lastPosition = Vector3.zero;
+            Vector3 pivotPos = player.transform.position;
+            Vector3 playerFootPos;
+            playerFootPos.x = pivotPos.x;
+            playerFootPos.y = pivotPos.y - 2f;
+            playerFootPos.z = pivotPos.z;
+            Vector3 playerHeadPos;
+            playerHeadPos.x = pivotPos.x;
+            playerHeadPos.y = pivotPos.y + 4f;
+            playerHeadPos.z = pivotPos.z;
+            int distanceToMob = (int)Vector3.Distance(pivotPos, localplayerPosition);
+
+            Vector3 w2s_footpos = Camera.main.WorldToScreenPoint(playerFootPos);
+            Vector3 w2s_headpos = Camera.main.WorldToScreenPoint(playerHeadPos);
+            Debug.Log(player.m_name);
+            if (w2s_footpos.z > 5f && lastPosition != pivotPos)
+            {
+                string playerName = player.GetPlayerName();
+                DrawBoxESPPlayers(w2s_footpos, w2s_headpos, colorBox, distanceToMob.ToString(), playerName, linesPlayers); //TODO passer en argument le nom du mob et définir sa width et height dans DrawBoxESP
+                lastPosition = pivotPos;
+
+            }
+        }
+
+
+
+        public void DrawBoxESPCharacters(Vector3 footpos, Vector3 headpos, Color color, string distanceToMob, string nameMob, bool lines)
 		{
 			float height = footpos.y - headpos.y;
 			float widthOffset = 2f;
 			float width = height / widthOffset;
             Render.DrawBox(footpos.x - (width / 2), (float)Screen.height - headpos.y - height, width, height , color, 2f);
-            Render.DrawString(new Vector2(headpos.x, (float)Screen.height - headpos.y + 10f), distanceToMob.ToString() + "m", true); // Distance to mob
-            Render.DrawString(new Vector2(headpos.x, (float)Screen.height - headpos.y -20f),  nameMob, true); // Name of mob
-            if (lines)
+            if (charactersDistance)
+            {
+                Render.DrawString(new Vector2(headpos.x, (float)Screen.height - headpos.y + 10f), distanceToMob.ToString() + "m", true); // Distance to mob
+            }
+            if (charactersName)
+            {
+                Render.DrawString(new Vector2(headpos.x, (float)Screen.height - headpos.y -20f),  nameMob, true); // Name of mob
+            }
+            if (charactersLines)
 			{
 				Vector2 screenCenter = new Vector2((float)Screen.width / 2, (float)Screen.height / 2);
 				Vector2 playerPosition = new Vector2(footpos.x, (float)Screen.height - headpos.y);
 
 
-                //Debug lines
-                Vector2 playerPositionhead = new Vector2(footpos.x, (float)Screen.height - headpos.y);
-                Vector2 playerPositionFoot = new Vector2(footpos.x, (float)Screen.height - footpos.y);
 				Render.DrawLine(screenCenter, playerPosition, color, 2f);
 				//Render.DrawLine(playerPositionhead, playerPositionFoot, Color.green, 2f);
+            }
+
+        }
+
+        public void DrawBoxESPPlayers(Vector3 footpos, Vector3 headpos, Color color, string distanceToMob, string nameMob, bool lines)
+        {
+            float height = footpos.y - headpos.y;
+            float widthOffset = 2f;
+            float width = height / widthOffset;
+            Render.DrawBox(footpos.x - (width / 2), (float)Screen.height - headpos.y - height, width, height, color, 2f);
+            Render.DrawString(new Vector2(headpos.x, (float)Screen.height - headpos.y + 10f), distanceToMob.ToString() + "m", true); // Distance to mob
+            Render.DrawString(new Vector2(headpos.x, (float)Screen.height - headpos.y - 20f), nameMob, true); // Name of mob
+            if (lines)
+            {
+                Vector2 screenCenter = new Vector2((float)Screen.width / 2, (float)Screen.height / 2);
+                Vector2 playerPosition = new Vector2(footpos.x, (float)Screen.height - headpos.y);
+
+
+                Render.DrawLine(screenCenter, playerPosition, color, 2f);
+                //Render.DrawLine(playerPositionhead, playerPositionFoot, Color.green, 2f);
             }
 
         }
@@ -208,7 +395,11 @@ namespace ValheimHackGUI
         public void toggleInfiniteStaminaOthers()
         {
             infiniteStaminaOthers = !infiniteStaminaOthers;
+        }
 
+        public void toggleMenu()
+        {
+            cheatMenu = !cheatMenu;
         }
 
         public void Update()
@@ -272,9 +463,13 @@ namespace ValheimHackGUI
             }
 
 
-			//Insert -> Draw help ou open menu a voir
+            //Insert -> Draw help ou open menu a voir
+            if (Input.GetKeyDown(KeyCode.Insert))
+            {
+                toggleMenu();
+            }
 
-			//Delete
+            //Delete
             if (Input.GetKeyDown(KeyCode.Delete))
 			{
 				disableAllCheats();
@@ -425,7 +620,15 @@ namespace ValheimHackGUI
             buttonColorFly = false;
             buttonColorGod = false;
             buttonColorGhost = false;
+            // color buttons reset TODO
+            make_button_style(customButtonStyleStamina, new Color(0.8f, 0f, 0f, 0.5f)); // set stamina button red
+            make_button_style(customButtonStyleStaminaOthers, new Color(0.8f, 0f, 0f, 0.5f));// set staminaOthers button red
+            make_button_style(customButtonStyleFly, new Color(0.8f, 0f, 0f, 0.5f)); // set fly button red
+            make_button_style(customButtonStyleGodMode, new Color(0.8f, 0f, 0f, 0.5f)); // set god button red
+            make_button_style(customButtonStyleGhostMode, new Color(0.8f, 0f, 0f, 0.5f)); // set ghost button red
 
-    }
+
+
+        }
     }
 }
