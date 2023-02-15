@@ -375,22 +375,6 @@ namespace ValheimHackGUI
             }
         }
 
-        //buttons save
-        public void make_button_style2(GUIStyle style, Color color)
-        {
-            style.normal.background = new Texture2D(1, 1);
-            Color[] pixels = style.normal.background.GetPixels();
-            for (int i = 0; i < pixels.Length; i++)
-            {
-                pixels[i] = color;
-            }
-            style.normal.background.SetPixels(pixels);
-            style.normal.background.Apply();
-            style.normal.textColor = Color.white;
-            style.alignment = TextAnchor.MiddleCenter;
-
-        }
-
         //Buttons
         public void make_button_style(GUIStyle style, Color color)
         {
