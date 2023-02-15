@@ -45,7 +45,10 @@ namespace ValheimHackGUI
         public bool isDebugFlying = false;
 		public bool infiniteStamina = false;
 		public bool infiniteStaminaOthers = false;
+        public bool fly = false;
 
+        // ESP General
+        ESP esp = new ESP();
 
         // ESP characters 
         public bool EspCharacters = false;
@@ -53,11 +56,17 @@ namespace ValheimHackGUI
         public bool charactersLines = false;
         public bool charactersDistance = false;
         public bool charactersHealth = false;
+        float characterDrawRange = 150f;
 
+
+
+
+        //Misc
+        public bool helpCommands = true;
 
 
         //ESP players
-		public bool EspPlayers = false;
+        public bool EspPlayers = false;
 
         // Main Menu
         public bool cheatMenu = false;
@@ -77,7 +86,10 @@ namespace ValheimHackGUI
                 mainMenu();
             }
 
-            DrawCommands();
+            if (helpCommands)
+            {
+                DrawCommands();
+            }
 			if (EspCharacters)
 			{
 				List<Character> allCharacters = Character.GetAllCharacters();
@@ -89,12 +101,13 @@ namespace ValheimHackGUI
                     }
                     if (!character.IsPlayer() && EspCharacters)
                     {
-					    DrawESP(character, Color.red); //carrée rouge
+                        esp.DrawESPCharacters(character, Color.red, charactersDistance, charactersName, charactersLines, charactersHealth, characterDrawRange); //carrée rouge
                     }
 
 				}
-
 			}
+
+
             if (EspPlayers)
             {
                 List<Player> allPlayers = Player.GetAllPlayers();
@@ -106,10 +119,10 @@ namespace ValheimHackGUI
                     }
                     if (player.IsPVPEnabled())
                     {
-                        DrawESPPlayer(player, new Color(1,0.65f,0)); //carrée orange
+                        esp.DrawESPPlayer(player, new Color(1,0.65f,0)); //carrée orange
                     } else
                     {
-                        DrawESPPlayer(player, Color.green); //carrée vert
+                        esp.DrawESPPlayer(player, Color.green); //carrée vert
                     }
 
                 }
@@ -159,11 +172,30 @@ namespace ValheimHackGUI
                 charactersName = GUI.Toggle(new Rect(5, firstOption + 30, 200, 15),charactersName,"Name");
                 charactersDistance = GUI.Toggle(new Rect(5, firstOption + 60, 200, 15), charactersDistance, "Distance");
                 charactersLines = GUI.Toggle(new Rect(5, firstOption + 90, 200, 15), charactersLines, "Lines");
-                charactersHealth = GUI.Toggle(new Rect(5, firstOption + 120, 200, 15), charactersHealth, "Health (WIP)");
-
+                charactersHealth = GUI.Toggle(new Rect(5, firstOption + 120, 200, 20), charactersHealth, "Health");
+                GUI.Label(new Rect(5, firstOption + 145, 200, 25),"Distance : " + (int)characterDrawRange + "m");
+                characterDrawRange = GUI.HorizontalSlider(new Rect(5, firstOption + 170, 190, 15), characterDrawRange, 15, 150);
 
                 //Joueurs
                 GUI.Box(new Rect(200, 50, 200, 250), "Joueurs");
+            }
+            if (playerhacksTab)
+            {
+
+                float firstOption = 70f;
+                GUI.Box(new Rect(000, 50, 200, 250), "Player");
+                fly = GUI.Toggle(new Rect(5, firstOption, 200, 20),fly,"Fly");
+                GUI.Box(new Rect(200, 50, 200, 250), "Others");
+
+            }
+            if (teleportTab)
+            {
+                //return;
+            }
+            if (miscTab)
+            {
+                float firstOption = 70f;
+                helpCommands = GUI.Toggle(new Rect(5, firstOption, 200, 20), helpCommands, "Help keys");
             }
 
             // We need to match all BeginGroup calls with an EndGroup
@@ -240,120 +272,7 @@ namespace ValheimHackGUI
                 toggleInfiniteStaminaOthers();
             }
         }
-
-        public void DrawESP(Character character, Color colorBox)
-		{
-            
-            //List<string> mobsToDraw = new List<string>();
-            //mobsToDraw.Add("$enemy_greydwarf");
-            //if (!mobsToDraw.Contains(character.m_name))
-            //{
-            //    return;
-            //}
-            Player localplayer = Player.m_localPlayer;
-            string mobName = character.GetHoverName();
-            Vector3 localplayerPosition = localplayer.transform.position;
-
-            Vector3 lastPosition = Vector3.zero;
-			Vector3 pivotPos = character.transform.position;
-            Vector3 playerFootPos;
-			playerFootPos.x = pivotPos.x;
-			playerFootPos.y = pivotPos.y - 2f;
-			playerFootPos.z = pivotPos.z;
-            Vector3 playerHeadPos;
-			playerHeadPos.x = pivotPos.x;
-			playerHeadPos.y = pivotPos.y + 4f;
-			playerHeadPos.z = pivotPos.z;
-            int distanceToMob = (int)Vector3.Distance(pivotPos, localplayerPosition);
-
-            Vector3 w2s_footpos = Camera.main.WorldToScreenPoint(playerFootPos);
-			Vector3 w2s_headpos = Camera.main.WorldToScreenPoint(playerHeadPos);
-			if (w2s_footpos.z > 5f && lastPosition != pivotPos)
-			{
-
-                DrawBoxESPCharacters(w2s_footpos, w2s_headpos, colorBox, distanceToMob.ToString(), mobName, linesMobs); //TODO passer en argument le nom du mob et définir sa width et height dans DrawBoxESP
-				lastPosition = pivotPos;
-
-            }
-
-        }
-        public void DrawESPPlayer(Player player, Color colorBox)
-        {
-            Player localplayer = Player.m_localPlayer;
-
-            Vector3 localplayerPosition = localplayer.transform.position;
-
-            Vector3 lastPosition = Vector3.zero;
-            Vector3 pivotPos = player.transform.position;
-            Vector3 playerFootPos;
-            playerFootPos.x = pivotPos.x;
-            playerFootPos.y = pivotPos.y - 2f;
-            playerFootPos.z = pivotPos.z;
-            Vector3 playerHeadPos;
-            playerHeadPos.x = pivotPos.x;
-            playerHeadPos.y = pivotPos.y + 4f;
-            playerHeadPos.z = pivotPos.z;
-            int distanceToMob = (int)Vector3.Distance(pivotPos, localplayerPosition);
-
-            Vector3 w2s_footpos = Camera.main.WorldToScreenPoint(playerFootPos);
-            Vector3 w2s_headpos = Camera.main.WorldToScreenPoint(playerHeadPos);
-            Debug.Log(player.m_name);
-            if (w2s_footpos.z > 5f && lastPosition != pivotPos)
-            {
-                string playerName = player.GetPlayerName();
-                DrawBoxESPPlayers(w2s_footpos, w2s_headpos, colorBox, distanceToMob.ToString(), playerName, linesPlayers); //TODO passer en argument le nom du mob et définir sa width et height dans DrawBoxESP
-                lastPosition = pivotPos;
-
-            }
-        }
-
-
-
-        public void DrawBoxESPCharacters(Vector3 footpos, Vector3 headpos, Color color, string distanceToMob, string nameMob, bool lines)
-		{
-			float height = footpos.y - headpos.y;
-			float widthOffset = 2f;
-			float width = height / widthOffset;
-            Render.DrawBox(footpos.x - (width / 2), (float)Screen.height - headpos.y - height, width, height , color, 2f);
-            if (charactersDistance)
-            {
-                Render.DrawString(new Vector2(headpos.x, (float)Screen.height - headpos.y + 10f), distanceToMob.ToString() + "m", true); // Distance to mob
-            }
-            if (charactersName)
-            {
-                Render.DrawString(new Vector2(headpos.x, (float)Screen.height - headpos.y -20f),  nameMob, true); // Name of mob
-            }
-            if (charactersLines)
-			{
-				Vector2 screenCenter = new Vector2((float)Screen.width / 2, (float)Screen.height / 2);
-				Vector2 playerPosition = new Vector2(footpos.x, (float)Screen.height - headpos.y);
-
-
-				Render.DrawLine(screenCenter, playerPosition, color, 2f);
-				//Render.DrawLine(playerPositionhead, playerPositionFoot, Color.green, 2f);
-            }
-
-        }
-
-        public void DrawBoxESPPlayers(Vector3 footpos, Vector3 headpos, Color color, string distanceToMob, string nameMob, bool lines)
-        {
-            float height = footpos.y - headpos.y;
-            float widthOffset = 2f;
-            float width = height / widthOffset;
-            Render.DrawBox(footpos.x - (width / 2), (float)Screen.height - headpos.y - height, width, height, color, 2f);
-            Render.DrawString(new Vector2(headpos.x, (float)Screen.height - headpos.y + 10f), distanceToMob.ToString() + "m", true); // Distance to mob
-            Render.DrawString(new Vector2(headpos.x, (float)Screen.height - headpos.y - 20f), nameMob, true); // Name of mob
-            if (lines)
-            {
-                Vector2 screenCenter = new Vector2((float)Screen.width / 2, (float)Screen.height / 2);
-                Vector2 playerPosition = new Vector2(footpos.x, (float)Screen.height - headpos.y);
-
-
-                Render.DrawLine(screenCenter, playerPosition, color, 2f);
-                //Render.DrawLine(playerPositionhead, playerPositionFoot, Color.green, 2f);
-            }
-
-        }
+       
 
 
         public void toggleFly()
@@ -496,6 +415,7 @@ namespace ValheimHackGUI
                     buttonColorStamina = false;
                 } 
             }
+
 			if (infiniteStaminaOthers)
 			{
 				playerHacks.infiniteStaminaOthers();
@@ -512,7 +432,6 @@ namespace ValheimHackGUI
                     buttonColorStaminaOthers = false;
                 }
             }
-
 
             if (isButtonFlyPressed)
             {
