@@ -58,15 +58,20 @@ namespace ValheimHackGUI
         public bool charactersHealth = false;
         float characterDrawRange = 150f;
 
-
-
+        //ESP players
+        public bool EspPlayers = false;
+        public bool playersName = false;
+        public bool playersLines = false;
+        public bool playersDistance = false;
+        public bool playersHealth = false;
+        public bool playersPvp = false;
+        float playersDrawRange = 150f;
 
         //Misc
         public bool helpCommands = true;
 
 
-        //ESP players
-        public bool EspPlayers = false;
+
 
         // Main Menu
         public bool cheatMenu = false;
@@ -117,12 +122,12 @@ namespace ValheimHackGUI
                     {
                         continue;
                     }
-                    if (player.IsPVPEnabled())
+                    if (player.IsPVPEnabled() && playersPvp)
                     {
-                        esp.DrawESPPlayer(player, new Color(1,0.65f,0)); //carrée orange
+                        esp.DrawESPPlayer(player, new Color(1,0.65f,0), playersName, playersDistance, playersLines, playersHealth, playersDrawRange); //carrée orange
                     } else
                     {
-                        esp.DrawESPPlayer(player, Color.green); //carrée vert
+                        esp.DrawESPPlayer(player, Color.green, playersName, playersDistance, playersLines, playersHealth, playersDrawRange); //carrée vert
                     }
 
                 }
@@ -170,18 +175,27 @@ namespace ValheimHackGUI
                 float firstOption = 70f;
                 EspCharacters = GUI.Toggle(new Rect(5, firstOption, 200, 15), EspCharacters, "Activate"); 
                 charactersName = GUI.Toggle(new Rect(5, firstOption + 30, 200, 15),charactersName,"Name");
-                charactersDistance = GUI.Toggle(new Rect(5, firstOption + 60, 200, 15), charactersDistance, "Distance");
-                charactersLines = GUI.Toggle(new Rect(5, firstOption + 90, 200, 15), charactersLines, "Lines");
-                charactersHealth = GUI.Toggle(new Rect(5, firstOption + 120, 200, 20), charactersHealth, "Health");
+                charactersLines = GUI.Toggle(new Rect(5, firstOption + 60, 200, 15), charactersLines, "Lines");
+                charactersHealth = GUI.Toggle(new Rect(5, firstOption + 90, 200, 20), charactersHealth, "Health");
+                charactersDistance = GUI.Toggle(new Rect(5, firstOption + 120, 200, 15), charactersDistance, "Distance");
                 GUI.Label(new Rect(5, firstOption + 145, 200, 25),"Distance : " + (int)characterDrawRange + "m");
                 characterDrawRange = GUI.HorizontalSlider(new Rect(5, firstOption + 170, 190, 15), characterDrawRange, 15, 150);
 
                 //Joueurs
                 GUI.Box(new Rect(200, 50, 200, 250), "Joueurs");
+                firstOption = 70f;
+                EspPlayers = GUI.Toggle(new Rect(205, firstOption, 200, 15), EspPlayers, "Activate");
+                playersName = GUI.Toggle(new Rect(205, firstOption + 30, 200, 15), playersName, "Name");
+                playersLines = GUI.Toggle(new Rect(205, firstOption + 60, 200, 15), playersLines, "Lines");
+                playersHealth = GUI.Toggle(new Rect(205, firstOption + 90, 200, 20), playersHealth, "Health");
+                playersPvp = GUI.Toggle(new Rect(205, firstOption + 120, 200, 20), playersPvp, "Check Pvp");
+                playersDistance = GUI.Toggle(new Rect(205, firstOption + 150 , 200, 15), playersDistance, "Distance");
+                GUI.Label(new Rect(205, firstOption + 175, 200, 25), "Distance : " + (int)playersDrawRange + "m");
+                playersDrawRange = GUI.HorizontalSlider(new Rect(205, firstOption + 200, 190, 15), playersDrawRange, 15, 150);  
             }
-            if (playerhacksTab)
-            {
 
+            if (playerhacksTab)
+            {   
                 float firstOption = 70f;
                 GUI.Box(new Rect(000, 50, 200, 250), "Player");
                 fly = GUI.Toggle(new Rect(5, firstOption, 200, 20),fly,"Fly");
