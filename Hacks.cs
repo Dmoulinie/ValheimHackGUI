@@ -43,9 +43,11 @@ namespace ValheimHackGUI
         // Player Hacks
         PlayerHacks playerHacks = new PlayerHacks();
         public bool isDebugFlying = false;
-		public bool infiniteStamina = false;
+        public bool isGodMode = false;
+        public bool isGhostMode = false;
+
+        public bool infiniteStamina = false;
 		public bool infiniteStaminaOthers = false;
-        public bool fly = false;
 
         // ESP General
         ESP esp = new ESP();
@@ -198,8 +200,13 @@ namespace ValheimHackGUI
             {   
                 float firstOption = 70f;
                 GUI.Box(new Rect(000, 50, 200, 250), "Player");
-                fly = GUI.Toggle(new Rect(5, firstOption, 200, 20),fly,"Fly");
+                isDebugFlying = GUI.Toggle(new Rect(5, firstOption, 200, 20), isDebugFlying, "Fly");
+                isGodMode = GUI.Toggle(new Rect(5, firstOption + 30, 200, 20), isGodMode, "God Mode");
+                isGhostMode = GUI.Toggle(new Rect(5, firstOption + 60, 200, 20), isGhostMode, "Ghost");
+                infiniteStamina = GUI.Toggle(new Rect(5, firstOption + 90, 200, 20), infiniteStamina, "Infinite stamina");
                 GUI.Box(new Rect(200, 50, 200, 250), "Others");
+                firstOption = 70f;
+                infiniteStaminaOthers = GUI.Toggle(new Rect(205, firstOption, 200, 20), infiniteStaminaOthers, "Infinite Stamina Others");
 
             }
             if (teleportTab)
@@ -291,33 +298,17 @@ namespace ValheimHackGUI
 
         public void toggleFly()
         {
-            if (!playerHacks.debugFly())
-            {
-                isButtonFlyPressed = false;
-                return;
-            }
-            isButtonFlyPressed = true;
-            
+            isDebugFlying = !isDebugFlying;
         }
 
         public void toggleGodMode()
         {
-            if (!playerHacks.godMode())
-            {
-                isButtonGodModePressed = false;
-                return;
-            }
-            isButtonGodModePressed = true;
+            isGodMode = !isGodMode;
         }
 
         public void toggleGhostMode()
         {
-            if (!playerHacks.ghostMode())
-            {
-                isButtonGhostModePressed = false;
-                return;
-            }
-            isButtonGhostModePressed = true;
+            isGhostMode = !isGhostMode;
         }
 
         public void toggleInfiniteStamina()
@@ -413,7 +404,69 @@ namespace ValheimHackGUI
 
         public void CheckToggles()
 		{
-			if (infiniteStamina)
+            if (isButtonFlyPressed || isDebugFlying)
+            {
+                playerHacks.setDebugFly(true);
+                if (!buttonColorFly) // if button red
+                {
+                    make_button_style(customButtonStyleFly, new Color(0f, 0.8f, 0f, 0.5f)); // set fly button green
+                    buttonColorFly = true;
+                }
+            }
+            else
+            {
+                playerHacks.setDebugFly(false);
+                if (buttonColorFly) // if button green
+                {
+                    make_button_style(customButtonStyleFly, new Color(0.8f, 0f, 0f, 0.5f)); // set fly button red
+                    buttonColorFly = false;
+
+                }
+            }
+
+
+            if (isButtonGodModePressed || isGodMode)
+            {
+                playerHacks.setGodMode(true);
+                if (!buttonColorGod) // if button red
+                {
+                    make_button_style(customButtonStyleGodMode, new Color(0f, 0.8f, 0f, 0.5f)); // set god button green
+                    buttonColorGod = true;
+
+                }
+            }
+            else
+            {
+                playerHacks.setGodMode(false);
+                if (buttonColorGod) // if button green
+                {
+                    make_button_style(customButtonStyleGodMode, new Color(0.8f, 0f, 0f, 0.5f)); // set god button red
+                    buttonColorGod = false;
+                }
+            }
+
+            if (isButtonGhostModePressed || isGhostMode)
+            {
+                playerHacks.setGhostMode(true);
+                if (!buttonColorGhost) // if button red
+                {
+
+                    make_button_style(customButtonStyleGhostMode, new Color(0f, 0.8f, 0f, 0.5f)); // set ghost button green
+                    buttonColorGhost = true;
+                }
+            }
+            else
+            {
+                playerHacks.setGhostMode(false);
+                if (buttonColorGhost) // if button green
+                {
+                    make_button_style(customButtonStyleGhostMode, new Color(0.8f, 0f, 0f, 0.5f)); // set ghost button red
+                    buttonColorGhost = false;
+
+                }
+            }
+
+            if (infiniteStamina)
 			{
 				playerHacks.infiniteStamina();
                 if(!buttonColorStamina) // if button red
@@ -447,60 +500,8 @@ namespace ValheimHackGUI
                 }
             }
 
-            if (isButtonFlyPressed)
-            {
-                if (!buttonColorFly) // if button red
-                {
-                    make_button_style(customButtonStyleFly, new Color(0f, 0.8f, 0f, 0.5f)); // set fly button green
-                    buttonColorFly = true;
-                }
-            }
-            else
-            {
-                if (buttonColorFly) // if button green
-                {
-                    make_button_style(customButtonStyleFly, new Color(0.8f, 0f, 0f, 0.5f)); // set fly button red
-                    buttonColorFly = false;
+            
 
-                }
-            }
-
-            if (isButtonGodModePressed) 
-            {
-                if (!buttonColorGod) // if button red
-                {
-                    make_button_style(customButtonStyleGodMode, new Color(0f, 0.8f, 0f, 0.5f)); // set god button green
-                    buttonColorGod = true;
-
-                }
-            }
-            else                       
-            {
-                if (buttonColorGod) // if button green
-                {
-                    make_button_style(customButtonStyleGodMode, new Color(0.8f, 0f, 0f, 0.5f)); // set god button red
-                    buttonColorGod = false;
-                }
-            }
-
-            if (isButtonGhostModePressed) 
-            {
-                if (!buttonColorGhost) // if button red
-                {
-
-                    make_button_style(customButtonStyleGhostMode, new Color(0f, 0.8f, 0f, 0.5f)); // set ghost button green
-                    buttonColorGhost = true;
-                }
-            }
-            else 
-            {
-                if (buttonColorGhost) // if button green
-                {
-                    make_button_style(customButtonStyleGhostMode, new Color(0.8f, 0f, 0f, 0.5f)); // set ghost button red
-                    buttonColorGhost = false;
-
-                }
-            }
         }
 
         //Buttons

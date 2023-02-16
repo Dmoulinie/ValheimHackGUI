@@ -14,8 +14,29 @@ namespace ValheimHack
             {
                 return false;
             }
-            return localplayer.ToggleDebugFly();
-            
+            return localplayer.ToggleDebugFly();   
+        }
+
+        public void setDebugFly(bool value)
+        {
+            Player localplayer = Player.m_localPlayer;
+            if (localplayer == null)
+            {
+                return;
+            }
+
+            if (localplayer.IsDebugFlying() && value) // Si player vol déja et veut encore voler
+            {
+                return;
+            }
+
+            if (!localplayer.IsDebugFlying() && !value) // Si player vol pas et veut cancel (grave con)
+            {
+                return;
+            }
+
+            debugFly();
+
         }
 
 
@@ -30,6 +51,25 @@ namespace ValheimHack
             return localplayer.InGodMode();
         }
 
+        public void setGodMode(bool value)
+        {
+            Player localplayer = Player.m_localPlayer;
+            if (localplayer == null)
+            {
+                return;
+            }
+            if (localplayer.InGodMode() && value)  // Si player est en godmode et veut encore se mettre en godmode
+            {
+                return;
+            }
+            if (!localplayer.InGodMode() && !value) // Si player pas en godmode pas et veut cancel (grave con)
+            {
+                return;
+            }
+            localplayer.SetGodMode(value);
+
+        }
+
         public bool ghostMode()
         {
             Player localplayer = Player.m_localPlayer;
@@ -41,10 +81,29 @@ namespace ValheimHack
             return localplayer.InGhostMode();
         }
 
+        public void setGhostMode(bool value)
+        {
+            Player localplayer = Player.m_localPlayer;
+            if (localplayer == null)
+            {
+                return;
+            }
+            if (localplayer.InGhostMode() && value)
+            {
+                return;
+            }
+            if (!localplayer.InGhostMode() && !value)
+            {
+                return;
+            }    
+            localplayer.SetGhostMode(value);
+
+        }
+
         public void infiniteStamina()
         {
             Player localplayer = Player.m_localPlayer;
-            if (localplayer.GetStamina() < localplayer.GetMaxStamina() -1f)
+            if (localplayer.GetStamina() < localplayer.GetMaxStamina())
             {
                 localplayer.UseStamina(-localplayer.GetMaxStamina());
             }

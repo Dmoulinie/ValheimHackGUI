@@ -154,7 +154,7 @@ namespace ValheimHackGUI
             if (playersHealth)
             {
                 float offsetHealthDrawing = 20f;
-                Render.DrawString(new Vector2(headpos.x + (width / 2) - offsetHealthDrawing, (float)Screen.height - headpos.y + 10f), (int)health +1 + "/" + (int)maxHealth +1);
+                Render.DrawString(new Vector2(headpos.x + (width / 2) - offsetHealthDrawing, (float)Screen.height - headpos.y + 10f), ((int)health +1) + "/" + ((int)maxHealth +1));
             }
 
         }
