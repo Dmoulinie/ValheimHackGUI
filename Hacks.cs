@@ -205,6 +205,8 @@ namespace ValheimHackGUI
                 isGhostMode = GUI.Toggle(new Rect(5, firstOption + 60, 200, 20), isGhostMode, "Ghost");
                 infiniteStamina = GUI.Toggle(new Rect(5, firstOption + 90, 200, 20), infiniteStamina, "Infinite stamina");
                 GUI.Box(new Rect(200, 50, 200, 250), "Others");
+                firstOption = 70f;
+                infiniteStaminaOthers = GUI.Toggle(new Rect(205, firstOption, 200, 20), infiniteStaminaOthers, "Infinite Stamina Others");
 
             }
             if (teleportTab)
