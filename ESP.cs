@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
 
 namespace ValheimHackGUI
 {
@@ -6,7 +7,7 @@ namespace ValheimHackGUI
     {
 
         //-------------------------------------------------------Characters-------------------------------------------------------//
-        public void DrawESPCharacters(Character character, Color colorBox, bool charactersDistance, bool charactersName, bool charactersLines, bool charactersHealth, float characterDrawRange)
+        public void DrawESPCharacters(Character character, Color colorBox, bool charactersDistance, bool charactersName, bool charactersLines, bool charactersHealth, float characterDrawRange, float customHeightToHead = 0f, float customHeightToFoot = 0f)
         {
 
             //List<string> mobsToDraw = new List<string>();
@@ -16,7 +17,6 @@ namespace ValheimHackGUI
             //    return;
             //}
             Player localplayer = Player.m_localPlayer;
-            string mobName = character.GetHoverName();
             Vector3 localplayerPosition = localplayer.transform.position;
             Vector3 lastPosition = Vector3.zero;
 
@@ -36,17 +36,31 @@ namespace ValheimHackGUI
             if (w2s_footpos.z > 5f && lastPosition != pivotPos && distanceToMob < characterDrawRange)
             {
 
-                DrawBoxESPCharacters(w2s_footpos, w2s_headpos, colorBox, distanceToMob.ToString(), character.GetHoverName(), charactersDistance, charactersName, charactersLines, charactersHealth, character.GetHealth(), character.GetMaxHealth()); //TODO passer en argument le nom du mob et définir sa width et height dans DrawBoxESP
+                DrawBoxESPCharacters(w2s_footpos, w2s_headpos, colorBox, distanceToMob.ToString(), character.GetHoverName(), charactersDistance, charactersName, charactersLines, charactersHealth, character.GetHealth(), character.GetMaxHealth(), customHeightToHead, customHeightToFoot); //TODO passer en argument le nom du mob et définir sa width et height dans DrawBoxESP
                 lastPosition = pivotPos;
             }
         }
 
 
 
-        public void DrawBoxESPCharacters(Vector2 footpos, Vector2 headpos, Color color, string distanceToMob, string nameCharacter, bool charactersDistance,bool charactersName, bool charactersLines, bool charactersHealth, float health = 0, float maxHealth = 0)
+        public void DrawBoxESPCharacters(Vector2 footpos, Vector2 headpos, Color color, string distanceToMob, string nameCharacter, bool charactersDistance,bool charactersName, bool charactersLines, bool charactersHealth, float health = 0, float maxHealth = 0, float customHeightToHead = 0f, float customHeightToFoot = 0f)
         {
+            //make a 2 entries dictionnary with name and other parameter
+            //if (nameCharacter == "Greydwarf")
+            //{
+            //    width = 1.5f;
+            //    height = 2.5f;
+            //}
+            float distanceToMobForCalc = int.Parse(distanceToMob);
+            if (distanceToMobForCalc < 15f)
+            {
+                distanceToMobForCalc = 15f;
+            }
+            
+            headpos.y -= customHeightToHead / distanceToMobForCalc;
+            footpos.y += customHeightToFoot / distanceToMobForCalc;
             float height = footpos.y - headpos.y;
-            float widthOffset = 3f;
+            float widthOffset = 2f;
             float width = height / widthOffset;
             Render.DrawBox(footpos.x - (width / 2), (float)Screen.height - headpos.y - height, width, height, color, 2f);
             if (charactersDistance)

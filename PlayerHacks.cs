@@ -72,6 +72,7 @@ namespace ValheimHack
 
         public bool ghostMode()
         {
+            
             Player localplayer = Player.m_localPlayer;
             if (localplayer == null)
             {

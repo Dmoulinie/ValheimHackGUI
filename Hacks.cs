@@ -59,6 +59,9 @@ namespace ValheimHackGUI
         public bool charactersDistance = false;
         public bool charactersHealth = false;
         float characterDrawRange = 150f;
+        //Test custom height
+        public float customHeightToHead;
+        public float customHeightToFoot;
 
         //ESP players
         public bool EspPlayers = false;
@@ -108,7 +111,7 @@ namespace ValheimHackGUI
                     }
                     if (!character.IsPlayer() && EspCharacters)
                     {
-                        esp.DrawESPCharacters(character, Color.red, charactersDistance, charactersName, charactersLines, charactersHealth, characterDrawRange); //carrée rouge
+                        esp.DrawESPCharacters(character, Color.red, charactersDistance, charactersName, charactersLines, charactersHealth, characterDrawRange, customHeightToHead,customHeightToFoot); //carrée rouge
                     }
 
 				}
@@ -208,6 +211,7 @@ namespace ValheimHackGUI
                 firstOption = 70f;
                 infiniteStaminaOthers = GUI.Toggle(new Rect(205, firstOption, 200, 20), infiniteStaminaOthers, "Infinite Stamina Others");
 
+
             }
             if (teleportTab)
             {
@@ -217,6 +221,12 @@ namespace ValheimHackGUI
             {
                 float firstOption = 70f;
                 helpCommands = GUI.Toggle(new Rect(5, firstOption, 200, 20), helpCommands, "Help keys");
+                GUI.Label(new Rect(5, firstOption += 30, 200, 50), "Custom height to headpos to remove : " + customHeightToHead);
+                customHeightToHead = GUI.HorizontalSlider(new Rect (5, firstOption += 30, 190, 15), customHeightToHead, 0, 1000);
+
+
+                GUI.Label(new Rect(5, firstOption += 30, 200, 50), "Custom height to footpos to add : " + customHeightToFoot);
+                customHeightToFoot = GUI.HorizontalSlider(new Rect(5, firstOption += 30, 190, 15), customHeightToFoot, 0, 1000);
             }
 
             // We need to match all BeginGroup calls with an EndGroup
