@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using System;
 
 namespace ValheimHackGUI
 {
@@ -36,29 +37,33 @@ namespace ValheimHackGUI
             if (w2s_footpos.z > 5f && lastPosition != pivotPos && distanceToMob < characterDrawRange)
             {
 
-                DrawBoxESPCharacters(w2s_footpos, w2s_headpos, colorBox, distanceToMob.ToString(), character.GetHoverName(), charactersDistance, charactersName, charactersLines, charactersHealth, character.GetHealth(), character.GetMaxHealth(), customHeightToHead, customHeightToFoot); //TODO passer en argument le nom du mob et définir sa width et height dans DrawBoxESP
+                DrawBoxESPCharacters(w2s_footpos, w2s_headpos, colorBox, distanceToMob.ToString(), character.GetHoverName(), charactersDistance, charactersName, charactersLines, charactersHealth, character.GetHealth(), character.GetMaxHealth()); //TODO passer en argument le nom du mob et définir sa width et height dans DrawBoxESP
                 lastPosition = pivotPos;
             }
         }
 
 
 
-        public void DrawBoxESPCharacters(Vector2 footpos, Vector2 headpos, Color color, string distanceToMob, string nameCharacter, bool charactersDistance,bool charactersName, bool charactersLines, bool charactersHealth, float health = 0, float maxHealth = 0, float customHeightToHead = 0f, float customHeightToFoot = 0f)
+        public void DrawBoxESPCharacters(Vector2 footpos, Vector2 headpos, Color color, string distanceToMob, string nameCharacter, bool charactersDistance,bool charactersName, bool charactersLines, bool charactersHealth, float health = 0, float maxHealth = 0)
         {
-            //make a 2 entries dictionnary with name and other parameter
-            //if (nameCharacter == "Greydwarf")
-            //{
-            //    width = 1.5f;
-            //    height = 2.5f;
-            //}
+            Dictionary<string, Tuple<float, float>> mobsAndSize = new Dictionary<string, Tuple<float, float>>
+            {
+                { "Greydwarf", new Tuple<float, float>(1200f,1200f) },
+                { "Deer", new Tuple<float, float>(1000f,1000f) },
+                { "Neck", new Tuple<float, float>(1400f,1200f) },
+
+            };
             float distanceToMobForCalc = int.Parse(distanceToMob);
             if (distanceToMobForCalc < 15f)
             {
                 distanceToMobForCalc = 15f;
             }
-            
-            headpos.y -= customHeightToHead / distanceToMobForCalc;
-            footpos.y += customHeightToFoot / distanceToMobForCalc;
+            Tuple<float, float> customSize = new Tuple<float,float>(0f,0f);
+            mobsAndSize.TryGetValue(nameCharacter, out customSize);
+
+            //TODO ESP don't work when lines 65 and 66 are not commented
+            headpos.y -= 1200f / distanceToMobForCalc;
+            footpos.y += 1200f / distanceToMobForCalc;
             float height = footpos.y - headpos.y;
             float widthOffset = 2f;
             float width = height / widthOffset;
@@ -143,6 +148,13 @@ namespace ValheimHackGUI
 
         public void DrawBoxESPPlayers(Vector3 footpos, Vector3 headpos, Color color, string distanceToPlayer, string namePlayer, bool playersName, bool playersDistance, bool playersLines, bool playersHealth, float health = 0, float maxHealth = 0)
         {
+            float distanceToMobForCalc = int.Parse(distanceToPlayer);
+            if (distanceToMobForCalc < 15f)
+            {
+                distanceToMobForCalc = 15f;
+            }
+            headpos.y -= 1200f / distanceToMobForCalc;
+            footpos.y += 1200f / distanceToMobForCalc;
             float height = footpos.y - headpos.y;
             float widthOffset = 2f;
             float width = height / widthOffset;

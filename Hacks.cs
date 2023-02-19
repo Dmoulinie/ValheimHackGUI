@@ -2,13 +2,16 @@
 using System.Collections.Generic;
 using ValheimHack;
 using System.Security.Policy;
+using System;
+using UnityEngine.UI;
+using UnityEngine.UIElements;
 
 namespace ValheimHackGUI
 {
 	class Hacks : MonoBehaviour
 	{
 
-        //Button Skin Test
+        //Button Skin
         GUIStyle customButtonStyleFly = new GUIStyle();
         GUIStyle customButtonStyleGodMode = new GUIStyle();
         GUIStyle customButtonStyleGhostMode = new GUIStyle();
@@ -18,6 +21,9 @@ namespace ValheimHackGUI
 		public bool isButtonGodModePressed = false;
 		public bool isButtonGhostModePressed = false;
         //stamina utiliser variables en dessous
+
+        public bool noLocalPlayerFound = false;
+
 
         // couleurs on/off bouttons -> fix memory leak
         public bool buttonColorStamina = false; // true = green | false = red
@@ -54,23 +60,30 @@ namespace ValheimHackGUI
 
         // ESP characters 
         public bool EspCharacters = false;
-        public bool charactersName = false;
+        public bool charactersName = true;
         public bool charactersLines = false;
         public bool charactersDistance = false;
         public bool charactersHealth = false;
-        float characterDrawRange = 150f;
-        //Test custom height
-        public float customHeightToHead;
-        public float customHeightToFoot;
+        float characterDrawRange = 200f;
+
 
         //ESP players
         public bool EspPlayers = false;
-        public bool playersName = false;
+        public bool playersName = true;
         public bool playersLines = false;
         public bool playersDistance = false;
-        public bool playersHealth = false;
+        public bool playersHealth = true;
         public bool playersPvp = false;
-        float playersDrawRange = 150f;
+        float playersDrawRange = 200f;
+
+
+
+        //Teleport
+        Teleport teleport = new Teleport();
+        int chosenPlayer = 0;
+        Vector2 scroll;
+        public string[] selStrings = new string[]();
+
 
         //Misc
         public bool helpCommands = true;
@@ -80,16 +93,26 @@ namespace ValheimHackGUI
 
         // Main Menu
         public bool cheatMenu = false;
+        public float width = 400f;
+        public float height = 300f;
 
         // Main Menu Tabs
+        public float mainTabsButtonsCount = 4f;
         public bool wallhackTab = true;
         public bool playerhacksTab = false;
         public bool teleportTab = false;
         public bool miscTab = false;
 
+        // Teleport Sub Tabs
+        public float subTabsButtonsCount = 4f;
+        public bool teleportToPlayerTab = true;
+        public bool teleportToMeTab = false;
+        public bool teleportPlayerToPlayerTab = false;
+        public bool teleportToLocationTab = false;
+
         public void OnGUI()
 		{
-            GUI.Label(new Rect(0, 0, 110, 20), "Pano Menu"); // Watermark
+            GUI.Label(new Rect(0, 0, 110, 20), "Pano Menu Unreleased"); // Watermark
 
             if (cheatMenu)
             {
@@ -111,7 +134,18 @@ namespace ValheimHackGUI
                     }
                     if (!character.IsPlayer() && EspCharacters)
                     {
-                        esp.DrawESPCharacters(character, Color.red, charactersDistance, charactersName, charactersLines, charactersHealth, characterDrawRange, customHeightToHead,customHeightToFoot); //carrée rouge
+                        if (character.IsTamed())
+                        {
+                            esp.DrawESPCharacters(character, Color.cyan, charactersDistance, charactersName, charactersLines, charactersHealth, characterDrawRange); //carrée bleu boar 2 etoiles
+                        }
+                        else if (character.GetLevel() == 3) // mob 2 étoiles
+                        {
+                            esp.DrawESPCharacters(character, Color.blue, charactersDistance, charactersName, charactersLines, charactersHealth, characterDrawRange); //carrée bleu boar 2 etoiles
+                        }
+                        else
+                        {
+                            esp.DrawESPCharacters(character, Color.red, charactersDistance, charactersName, charactersLines, charactersHealth, characterDrawRange); //carrée rouge
+                        }
                     }
 
 				}
@@ -184,7 +218,7 @@ namespace ValheimHackGUI
                 charactersHealth = GUI.Toggle(new Rect(5, firstOption + 90, 200, 20), charactersHealth, "Health");
                 charactersDistance = GUI.Toggle(new Rect(5, firstOption + 120, 200, 15), charactersDistance, "Distance");
                 GUI.Label(new Rect(5, firstOption + 145, 200, 25),"Distance : " + (int)characterDrawRange + "m");
-                characterDrawRange = GUI.HorizontalSlider(new Rect(5, firstOption + 170, 190, 15), characterDrawRange, 15, 150);
+                characterDrawRange = GUI.HorizontalSlider(new Rect(5, firstOption + 170, 190, 15), characterDrawRange, 15, 200);
 
                 //Joueurs
                 GUI.Box(new Rect(200, 50, 200, 250), "Joueurs");
@@ -196,7 +230,7 @@ namespace ValheimHackGUI
                 playersPvp = GUI.Toggle(new Rect(205, firstOption + 120, 200, 20), playersPvp, "Check Pvp");
                 playersDistance = GUI.Toggle(new Rect(205, firstOption + 150 , 200, 15), playersDistance, "Distance");
                 GUI.Label(new Rect(205, firstOption + 175, 200, 25), "Distance : " + (int)playersDrawRange + "m");
-                playersDrawRange = GUI.HorizontalSlider(new Rect(205, firstOption + 200, 190, 15), playersDrawRange, 15, 150);  
+                playersDrawRange = GUI.HorizontalSlider(new Rect(205, firstOption + 200, 190, 15), playersDrawRange, 15, 200);  
             }
 
             if (playerhacksTab)
@@ -215,18 +249,45 @@ namespace ValheimHackGUI
             }
             if (teleportTab)
             {
-                //return;
+                if (GUI.Button(new Rect(0,55,width/subTabsButtonsCount,30), "TP to player"))
+                {
+                    teleportToPlayerTab = true;
+                    disableAllSubTabsExcept("TeleportToPlayerTab");
+                }
+
+                if (GUI.Button(new Rect(100, 55, width / subTabsButtonsCount, 30), "TP to me"))
+                {
+                    teleportToMeTab = true;
+                    disableAllSubTabsExcept("teleportToMeTab");
+                }
+
+                if (GUI.Button(new Rect(200, 55, width / subTabsButtonsCount, 30), "TP P2P"))
+                {
+                    teleportPlayerToPlayerTab = true;
+                    disableAllSubTabsExcept("teleportPlayerToPlayerTab");
+                }
+
+                if (GUI.Button(new Rect(300, 55, width / subTabsButtonsCount, 30), "TP Location"))
+                {
+                    teleportToLocationTab = true;
+                    disableAllSubTabsExcept("teleportToLocationTab");
+                }
+
+                // Drawing what's inside the subtabs of the teleport Tab
+
+                if (teleportToPlayerTab)
+                {
+                    List<Player> players= new List<Player>();
+                    GUI.Label(new Rect(85, 85, 400, 20), "Teleport me to selected player in range");
+                    chosenPlayer = GUI.SelectionGrid(new Rect(5f, 90f, 195f, 195), chosenPlayer, selStrings, 1);
+                }
+
             }
             if (miscTab)
             {
                 float firstOption = 70f;
                 helpCommands = GUI.Toggle(new Rect(5, firstOption, 200, 20), helpCommands, "Help keys");
-                GUI.Label(new Rect(5, firstOption += 30, 200, 50), "Custom height to headpos to remove : " + customHeightToHead);
-                customHeightToHead = GUI.HorizontalSlider(new Rect (5, firstOption += 30, 190, 15), customHeightToHead, 0, 1000);
-
-
-                GUI.Label(new Rect(5, firstOption += 30, 200, 50), "Custom height to footpos to add : " + customHeightToFoot);
-                customHeightToFoot = GUI.HorizontalSlider(new Rect(5, firstOption += 30, 190, 15), customHeightToFoot, 0, 1000);
+                
             }
 
             // We need to match all BeginGroup calls with an EndGroup
@@ -261,13 +322,42 @@ namespace ValheimHackGUI
             }
         }
 
+        public void disableAllSubTabsExcept(string tab)
+        {
+            switch (tab)
+            {
+                case "teleportToPlayerTab":
+                    teleportToMeTab = false;
+                    teleportPlayerToPlayerTab = false;
+                    teleportToLocationTab = false;
+                    break;
+                case "teleportToMeTab":
+                    teleportToPlayerTab = false;
+                    teleportPlayerToPlayerTab = false;
+                    teleportToLocationTab = false;
+                    break;
+                case "teleportPlayerToPlayerTab":
+                    teleportToMeTab = false;
+                    teleportToPlayerTab = false;
+                    teleportToLocationTab = false;
+                    break;
+                case "teleportToLocation":
+                    teleportToMeTab = false;
+                    teleportPlayerToPlayerTab = false;
+                    teleportToPlayerTab = false;
+                    break;
+            }
+        }
+
+
+
         public void Start()
         {
-            make_button_style(customButtonStyleStamina, new Color(0.8f, 0f, 0f, 0.5f)); // set stamina button red
-            make_button_style(customButtonStyleStaminaOthers, new Color(0.8f, 0f, 0f, 0.5f)); // set stamina button red
-            make_button_style(customButtonStyleFly, new Color(0.8f, 0f, 0f, 0.5f)); // set stamina button red
-            make_button_style(customButtonStyleGodMode, new Color(0.8f, 0f, 0f, 0.5f)); // set stamina button red
-            make_button_style(customButtonStyleGhostMode, new Color(0.8f, 0f, 0f, 0.5f)); // set stamina button red
+            //make_button_style(customButtonStyleStamina, new Color(0.8f, 0f, 0f, 0.5f)); // set stamina button red
+            //make_button_style(customButtonStyleStaminaOthers, new Color(0.8f, 0f, 0f, 0.5f)); // set stamina button red
+            //make_button_style(customButtonStyleFly, new Color(0.8f, 0f, 0f, 0.5f)); // set stamina button red
+            //make_button_style(customButtonStyleGodMode, new Color(0.8f, 0f, 0f, 0.5f)); // set stamina button red
+            //make_button_style(customButtonStyleGhostMode, new Color(0.8f, 0f, 0f, 0.5f)); // set stamina button red
 
         }
 
@@ -339,7 +429,7 @@ namespace ValheimHackGUI
         public void Update()
 		{
 			Key_Handler();
-			CheckToggles();
+			Toggles();
         }
 
 		public void Key_Handler()
@@ -412,8 +502,19 @@ namespace ValheimHackGUI
 
 
 
-        public void CheckToggles()
+        public void Toggles()
 		{
+            Player localplayer = Player.m_localPlayer;
+            if (localplayer == null && !noLocalPlayerFound)
+            {
+                noLocalPlayerFound = true;
+                make_button_style(customButtonStyleFly, new Color(0.8f, 0f, 0f, 0.5f)); // set fly button red
+                make_button_style(customButtonStyleGodMode, new Color(0.8f, 0f, 0f, 0.5f)); // set god button red
+                make_button_style(customButtonStyleGhostMode, new Color(0.8f, 0f, 0f, 0.5f)); // set ghost button red
+                make_button_style(customButtonStyleStamina, new Color(0.8f, 0f, 0f, 0.5f)); // set stamina button red
+                make_button_style(customButtonStyleStaminaOthers, new Color(0.8f, 0f, 0f, 0.5f));// set staminaOthers button red
+                return;
+            }
             if (isButtonFlyPressed || isDebugFlying)
             {
                 playerHacks.setDebugFly(true);
@@ -472,7 +573,6 @@ namespace ValheimHackGUI
                 {
                     make_button_style(customButtonStyleGhostMode, new Color(0.8f, 0f, 0f, 0.5f)); // set ghost button red
                     buttonColorGhost = false;
-
                 }
             }
 
@@ -483,14 +583,14 @@ namespace ValheimHackGUI
                 { 
                     make_button_style(customButtonStyleStamina, new Color(0f, 0.8f, 0f, 0.5f)); // set stamina button green
                     buttonColorStamina = true;
-                } 
-			} else
+                }
+            } else
             {
                 if (buttonColorStamina) // if button green
                 { 
                     make_button_style(customButtonStyleStamina, new Color(0.8f, 0f, 0f, 0.5f)); // set stamina button red
                     buttonColorStamina = false;
-                } 
+                }
             }
 
 			if (infiniteStaminaOthers)
@@ -501,6 +601,7 @@ namespace ValheimHackGUI
                     make_button_style(customButtonStyleStaminaOthers, new Color(0f, 0.8f, 0f, 0.5f)); // set staminaOthers button green
                     buttonColorStaminaOthers = true;
                 }
+                noLocalPlayerFound = false;
             } else
             {
                 if (buttonColorStaminaOthers) // if button green
@@ -552,11 +653,11 @@ namespace ValheimHackGUI
 			infiniteStaminaOthers = false;
 			EspCharacters = false;
 			EspPlayers = false;
-            playerHacks.disableDebugFly();
+            isDebugFlying = false;
             isButtonFlyPressed = false;
-            playerHacks.disableGodMode();
+            isGodMode = false;
+            isGhostMode = false;
             isButtonGodModePressed = false;
-            playerHacks.disableGhostMode();
             isButtonGhostModePressed = false;
             //Make all buttons colors red
             buttonColorStamina = false; 
