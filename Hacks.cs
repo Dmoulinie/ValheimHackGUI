@@ -5,6 +5,7 @@ using System.Security.Policy;
 using System;
 using UnityEngine.UI;
 using UnityEngine.UIElements;
+using System.Linq;
 
 namespace ValheimHackGUI
 {
@@ -123,8 +124,7 @@ namespace ValheimHackGUI
             }
 			if (EspCharacters)
 			{
-				List<Character> allCharacters = Character.GetAllCharacters();
-				foreach (Character character in allCharacters)
+				foreach (Character character in Character.GetAllCharacters())
 				{
                     if (character.IsPlayer() && !EspPlayers) // Check si ESP joueur activé
                     {
@@ -150,15 +150,15 @@ namespace ValheimHackGUI
 			}
 
 
-            if (EspPlayers)
+            if (EspPlayers && Player.GetAllPlayers().Count > 1) // Bug when no players found (in menu) (count > 1 (myself) )// In logs
             {
-                List<Player> allPlayers = Player.GetAllPlayers();
-                foreach (Player player in allPlayers)
+                foreach (Player player in Player.GetAllPlayers())
                 {
-                    if (player == Player.m_localPlayer)
+                    if (player == Player.m_localPlayer || player == null)
                     {
                         continue;
                     }
+
                     if (player.IsPVPEnabled() && playersPvp)
                     {
                         esp.DrawESPPlayer(player, new Color(1,0.65f,0), playersName, playersDistance, playersLines, playersHealth, playersDrawRange); //carrée orange
@@ -247,7 +247,7 @@ namespace ValheimHackGUI
             }
             if (teleportTab)
             {
-                if (GUI.Button(new Rect(0,55,width/subTabsButtonsCount,30), "TP to player"))
+                if (GUI.Button(new Rect(0,55, width / subTabsButtonsCount,30), "TP to player"))
                 {
                     teleportToPlayerTab = true;
                     disableAllSubTabsExcept("TeleportToPlayerTab");
@@ -275,20 +275,19 @@ namespace ValheimHackGUI
 
                 if (teleportToPlayerTab) // if ram abuse make a refresh list button
                 {
-                    List<Player> allPlayersInRange = new List<Player>();
-                    allPlayersInRange = Player.GetAllPlayers();
+                    GUI.Label(new Rect(85, 85, 400, 20), "Teleport me to selected player in range"); // Title
+
+                    List<Player> allPlayersInRange = Player.GetAllPlayers();
                     Dictionary<int,long> allPlayersDict = new Dictionary<int,long>();
-                    String[] allPlayersName = new String[allPlayersDict.Count];
-                    int i = 0;
+                    List<string> allPlayersName = new List<string>();
+
                     foreach (Player player in allPlayersInRange)
                     {
-                        allPlayersDict.Add(i, player.GetPlayerID());
-                        allPlayersName[i] = player.GetHoverName();
-                        i++;
+                        allPlayersDict.Add(allPlayersDict.Count, player.GetPlayerID());
+                        allPlayersName.Add(player.GetHoverName());  
                     }
 
-                    GUI.Label(new Rect(85, 85, 400, 20), "Teleport me to selected player in range");
-                    chosenPlayer = GUI.SelectionGrid(new Rect(5f, 90f, 195f, 195), chosenPlayer, allPlayersName, 1);
+                    chosenPlayer = GUI.SelectionGrid(new Rect(5f, 100f, 195f, 195), chosenPlayer, allPlayersName.ToArray(), 1); // Toarray() = List<string> -> string[] for GUI.SelectionGrid
 
                     GUI.Label(new Rect(250, 90, 150, 30), allPlayersName[chosenPlayer]);
 
@@ -304,22 +303,30 @@ namespace ValheimHackGUI
 
                 if (teleportToMeTab)
                 {
-                    List<Player> allPlayersInRange = new List<Player>();
-                    allPlayersInRange = Player.GetAllPlayers();
+                    List<Player> allPlayersInRange = Player.GetAllPlayers();
+                    Player.GetPlayersInRange(Player.m_localPlayer.transform.position, 200f, allPlayersInRange);
                     Dictionary<int, long> allPlayersDict = new Dictionary<int, long>();
-                    String[] allPlayersName = new String[allPlayersDict.Count];
-                    int i = 0;
-                    foreach (Player player in allPlayersInRange)
+                    List<string> allPlayersName = new List<string>();
+                    if (allPlayersInRange.Count <= 1)
                     {
+                        return;
+                    }
+                    int i = 0;
+                    foreach (Player player in allPlayersInRange.ToList())
+                    {
+                        if (player == Player.m_localPlayer) // Remove self player
+                        {
+                            continue;
+                        }
                         allPlayersDict.Add(i, player.GetPlayerID());
-                        allPlayersName[i] = player.GetHoverName();
+                        allPlayersName.Add(player.GetHoverName());
                         i++;
                     }
 
-                    GUI.Label(new Rect(85, 85, 400, 20), "Teleport me to selected player in range");
-                    chosenPlayer = GUI.SelectionGrid(new Rect(5f, 90f, 195f, 195), chosenPlayer, allPlayersName, 1);
+                    GUI.Label(new Rect(85, 85, 400, 20), "Teleport selected player to me ");
+                    chosenPlayer = GUI.SelectionGrid(new Rect(5f, 100f, 195f, 195), chosenPlayer, allPlayersName.ToArray(), 1); // To array List<string> -> string[]
 
-                    GUI.Label(new Rect(250, 90, 150, 30), allPlayersName[chosenPlayer]);
+                    GUI.Label(new Rect(250, 100, 150, 30), allPlayersName[chosenPlayer]);
 
                     if (GUI.Button(new Rect(250, 150, 100, 30), "Teleport"))
                     {
@@ -570,6 +577,7 @@ namespace ValheimHackGUI
                 make_button_style(customButtonStyleStaminaOthers, new Color(0.8f, 0f, 0f, 0.5f));// set staminaOthers button red
                 return;
             }
+            noLocalPlayerFound = false;
             if (isButtonFlyPressed || isDebugFlying)
             {
                 playerHacks.setDebugFly(true);
@@ -656,7 +664,6 @@ namespace ValheimHackGUI
                     make_button_style(customButtonStyleStaminaOthers, new Color(0f, 0.8f, 0f, 0.5f)); // set staminaOthers button green
                     buttonColorStaminaOthers = true;
                 }
-                noLocalPlayerFound = false;
             } else
             {
                 if (buttonColorStaminaOthers) // if button green
