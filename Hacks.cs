@@ -278,20 +278,25 @@ namespace ValheimHackGUI
                     GUI.Label(new Rect(85, 85, 400, 20), "Teleport me to selected player in range"); // Title
 
                     List<Player> allPlayersInRange = Player.GetAllPlayers();
-                    Dictionary<int,long> allPlayersDict = new Dictionary<int,long>();
+                    Dictionary<int, long> allPlayersDict = new Dictionary<int, long>();
                     List<string> allPlayersName = new List<string>();
 
                     foreach (Player player in allPlayersInRange)
                     {
                         allPlayersDict.Add(allPlayersDict.Count, player.GetPlayerID());
-                        allPlayersName.Add(player.GetHoverName());  
+                        allPlayersName.Add(player.GetHoverName());
+                    }
+                    if (allPlayersInRange.Count <= 1)
+                    {
+                        allPlayersName.Clear();
+                        allPlayersName.Add("No Players Found");
                     }
 
                     chosenPlayer = GUI.SelectionGrid(new Rect(5f, 100f, 195f, 195), chosenPlayer, allPlayersName.ToArray(), 1); // Toarray() = List<string> -> string[] for GUI.SelectionGrid
 
-                    GUI.Label(new Rect(250, 90, 150, 30), allPlayersName[chosenPlayer]);
+                    GUI.Label(new Rect(250, 150, 150, 30), allPlayersName[chosenPlayer]);
 
-                    if (GUI.Button(new Rect(250,150,100,30), "Teleport"))
+                    if (GUI.Button(new Rect(250, 250, 100, 30), "Teleport"))
                     {
                         Player localplayer = Player.m_localPlayer;
                         long targetPlayerId = 0;
@@ -303,32 +308,28 @@ namespace ValheimHackGUI
 
                 if (teleportToMeTab)
                 {
+                    GUI.Label(new Rect(85, 85, 400, 20), "Teleport selected player to me"); // Title
+
                     List<Player> allPlayersInRange = Player.GetAllPlayers();
-                    Player.GetPlayersInRange(Player.m_localPlayer.transform.position, 200f, allPlayersInRange);
                     Dictionary<int, long> allPlayersDict = new Dictionary<int, long>();
                     List<string> allPlayersName = new List<string>();
+
+                    foreach (Player player in allPlayersInRange)
+                    {
+                        allPlayersDict.Add(allPlayersDict.Count, player.GetPlayerID());
+                        allPlayersName.Add(player.GetHoverName());
+                    }
                     if (allPlayersInRange.Count <= 1)
                     {
-                        return;
-                    }
-                    int i = 0;
-                    foreach (Player player in allPlayersInRange.ToList())
-                    {
-                        if (player == Player.m_localPlayer) // Remove self player
-                        {
-                            continue;
-                        }
-                        allPlayersDict.Add(i, player.GetPlayerID());
-                        allPlayersName.Add(player.GetHoverName());
-                        i++;
+                        allPlayersName.Clear();
+                        allPlayersName.Add("No Players Found");
                     }
 
-                    GUI.Label(new Rect(85, 85, 400, 20), "Teleport selected player to me ");
-                    chosenPlayer = GUI.SelectionGrid(new Rect(5f, 100f, 195f, 195), chosenPlayer, allPlayersName.ToArray(), 1); // To array List<string> -> string[]
+                    chosenPlayer = GUI.SelectionGrid(new Rect(5f, 100f, 195f, 195), chosenPlayer, allPlayersName.ToArray(), 1); // Toarray() = List<string> -> string[] for GUI.SelectionGrid
 
-                    GUI.Label(new Rect(250, 100, 150, 30), allPlayersName[chosenPlayer]);
+                    GUI.Label(new Rect(250, 150, 150, 30), allPlayersName[chosenPlayer]);
 
-                    if (GUI.Button(new Rect(250, 150, 100, 30), "Teleport"))
+                    if (GUI.Button(new Rect(250, 250, 100, 30), "Teleport"))
                     {
                         Player localplayer = Player.m_localPlayer;
                         long targetPlayerId = 0;
