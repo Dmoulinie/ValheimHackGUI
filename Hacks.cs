@@ -250,7 +250,7 @@ namespace ValheimHackGUI
                 if (GUI.Button(new Rect(0,55, width / subTabsButtonsCount,30), "TP to player"))
                 {
                     teleportToPlayerTab = true;
-                    disableAllSubTabsExcept("TeleportToPlayerTab");
+                    disableAllSubTabsExcept("teleportToPlayerTab");
                 }
 
                 if (GUI.Button(new Rect(100, 55, width / subTabsButtonsCount, 30), "TP to me"))
