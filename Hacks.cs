@@ -81,8 +81,6 @@ namespace ValheimHackGUI
         //Teleport
         Teleport teleport = new Teleport();
         int chosenPlayer = 0;
-        Vector2 scroll;
-        public string[] selStrings = new string[]();
 
 
         //Misc
@@ -275,12 +273,69 @@ namespace ValheimHackGUI
 
                 // Drawing what's inside the subtabs of the teleport Tab
 
-                if (teleportToPlayerTab)
+                if (teleportToPlayerTab) // if ram abuse make a refresh list button
                 {
-                    List<Player> players= new List<Player>();
+                    List<Player> allPlayersInRange = new List<Player>();
+                    allPlayersInRange = Player.GetAllPlayers();
+                    Dictionary<int,long> allPlayersDict = new Dictionary<int,long>();
+                    String[] allPlayersName = new String[allPlayersDict.Count];
+                    int i = 0;
+                    foreach (Player player in allPlayersInRange)
+                    {
+                        allPlayersDict.Add(i, player.GetPlayerID());
+                        allPlayersName[i] = player.GetHoverName();
+                        i++;
+                    }
+
                     GUI.Label(new Rect(85, 85, 400, 20), "Teleport me to selected player in range");
-                    chosenPlayer = GUI.SelectionGrid(new Rect(5f, 90f, 195f, 195), chosenPlayer, selStrings, 1);
+                    chosenPlayer = GUI.SelectionGrid(new Rect(5f, 90f, 195f, 195), chosenPlayer, allPlayersName, 1);
+
+                    GUI.Label(new Rect(250, 90, 150, 30), allPlayersName[chosenPlayer]);
+
+                    if (GUI.Button(new Rect(250,150,100,30), "Teleport"))
+                    {
+                        Player localplayer = Player.m_localPlayer;
+                        long targetPlayerId = 0;
+                        allPlayersDict.TryGetValue(chosenPlayer, out targetPlayerId);
+                        Player targetPlayer = Player.GetPlayer(targetPlayerId);
+                        teleport.TeleportToPlayer(targetPlayer);
+                    }
                 }
+
+                if (teleportToMeTab)
+                {
+                    List<Player> allPlayersInRange = new List<Player>();
+                    allPlayersInRange = Player.GetAllPlayers();
+                    Dictionary<int, long> allPlayersDict = new Dictionary<int, long>();
+                    String[] allPlayersName = new String[allPlayersDict.Count];
+                    int i = 0;
+                    foreach (Player player in allPlayersInRange)
+                    {
+                        allPlayersDict.Add(i, player.GetPlayerID());
+                        allPlayersName[i] = player.GetHoverName();
+                        i++;
+                    }
+
+                    GUI.Label(new Rect(85, 85, 400, 20), "Teleport me to selected player in range");
+                    chosenPlayer = GUI.SelectionGrid(new Rect(5f, 90f, 195f, 195), chosenPlayer, allPlayersName, 1);
+
+                    GUI.Label(new Rect(250, 90, 150, 30), allPlayersName[chosenPlayer]);
+
+                    if (GUI.Button(new Rect(250, 150, 100, 30), "Teleport"))
+                    {
+                        Player localplayer = Player.m_localPlayer;
+                        long targetPlayerId = 0;
+                        allPlayersDict.TryGetValue(chosenPlayer, out targetPlayerId);
+                        Player targetPlayer = Player.GetPlayer(targetPlayerId);
+                        teleport.TeleportToMe(targetPlayer);
+                    }
+                }
+
+                if (teleportPlayerToPlayerTab)
+                {
+
+                }
+
 
             }
             if (miscTab)
