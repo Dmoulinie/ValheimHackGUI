@@ -7,7 +7,7 @@ namespace ValheimHackGUI
 {
     internal class Teleport
     {
-        public List<Tuple<Vector3, Quaternion>> teleportLocations;
+        public List<Tuple<Vector3, Quaternion>> teleportLocations = new List<Tuple<Vector3,Quaternion>>();
 
 
         public void TeleportToPlayer(Player targetPlayer)
