@@ -8,8 +8,7 @@ namespace ValheimHackGUI
     internal class Teleport
     {
         public List<Tuple<Vector3, Quaternion>> teleportLocations = new List<Tuple<Vector3,Quaternion>>();
-
-
+        public Tuple<Vector3, Quaternion> location;
         public void TeleportToPlayer(Player targetPlayer)
         {
             Player localplayer = Player.m_localPlayer;
@@ -71,8 +70,13 @@ namespace ValheimHackGUI
             Vector3 targetPosition = tupleTarget.Item1;
             Quaternion targetRotation = tupleTarget.Item2;
 
-            localplayer.TeleportTo(targetPosition, targetRotation, true);
+            localplayer.TeleportTo(targetPosition, targetRotation, false);
 
+        }
+
+        public Tuple<Vector3,Quaternion> getCurrentLocation()
+        {
+            return location;
         }
     }
 }

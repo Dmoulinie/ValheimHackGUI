@@ -392,6 +392,18 @@ namespace ValheimHackGUI
                     }
                 }
 
+                if (teleportToLocationTab)
+                {
+                    if (GUI.Button(new Rect(50, 260, 100, 30), "Save position"))
+                    {
+                        teleport.SaveLocation();
+                    }
+                    if (GUI.Button(new Rect(250, 260, 100, 30), "Teleport to position"))
+                    {
+                        teleport.TeleportToLocation(teleport.GetAllLocations()[0]);
+                    }
+                }
+
 
             }
             if (miscTab)
@@ -452,7 +464,7 @@ namespace ValheimHackGUI
                     teleportToPlayerTab = false;
                     teleportToLocationTab = false;
                     break;
-                case "teleportToLocation":
+                case "teleportToLocationTab":
                     teleportToMeTab = false;
                     teleportPlayerToPlayerTab = false;
                     teleportToPlayerTab = false;
