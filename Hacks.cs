@@ -372,8 +372,8 @@ namespace ValheimHackGUI
                         allPlayersName.Clear();
                         allPlayersName.Add("No Players Found");
                     }
-                    GUI.Label(new Rect(90f, 105f, 195f, 100f), "Player 1");
-                    GUI.Label(new Rect(90f / 2f, 105f, 195f, 100f), "Player 2");
+                    GUI.Label(new Rect(80f, 105f, 195f, 100f), "Player 1");
+                    GUI.Label(new Rect(280f, 105f, 195f, 100f), "Player 2");
                     chosenPlayer1 = GUI.SelectionGrid(new Rect(5f, 135f, 195f, 100f), chosenPlayer1, allPlayersName.ToArray(), 1); // Toarray() = List<string> -> string[] for GUI.SelectionGrid
                     chosenPlayer2 = GUI.SelectionGrid(new Rect(200f, 135f, 195f, 100f), chosenPlayer2, allPlayersName.ToArray(), 1); // Toarray() = List<string> -> string[] for GUI.SelectionGrid
 
