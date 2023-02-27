@@ -84,7 +84,9 @@ namespace ValheimHackGUI
         int chosenPlayer1 = 0;
         int chosenPlayer2 = 0;
         string locationName = "";
-
+        string location_position_x = "0";
+        string location_position_y = "0";
+        string location_position_z = "0";
 
         //Misc
         public bool helpCommands = true;
@@ -113,7 +115,7 @@ namespace ValheimHackGUI
 
         public void OnGUI()
 		{
-            GUI.Label(new Rect(0, 0, 110, 20), "Pano Menu Unreleased"); // Watermark
+            GUI.Label(new Rect(0, 0, 200, 20), "Pano Menu Unreleased"); // Watermark
 
             if (cheatMenu)
             {
@@ -404,13 +406,33 @@ namespace ValheimHackGUI
 
                 if (teleportToLocationTab)
                 {
-                    locationName = GUI.TextField(new Rect(5f, 105f, 195f, 20f), locationName, 25);
+                    GUI.Label(new Rect(25f, 85f, 175f, 20f), "Nom à enregistrer :");
+                    locationName = GUI.TextField(new Rect(5f, 105f, 170f, 20f), locationName, 20);
+                    GUI.Label(new Rect(30f,140f,185f,20f), "Position");
+                    if (GUI.Button(new Rect(80f,140f,95f, 20f),"Refresh"))
+                    {
+                        Player localplayer = Player.m_localPlayer;
+                        if (localplayer != null)
+                        {
+                            location_position_x = localplayer.transform.position.x.ToString();
+                            location_position_y = localplayer.transform.position.y.ToString();
+                            location_position_z = localplayer.transform.position.z.ToString();
+                        }
+                    }
+                    GUI.Label(new Rect(5f, 170f, 25f, 20f), " X : ");
+                    location_position_x = GUI.TextField(new Rect(35f, 170f, 140f, 20f), location_position_x, 15);
+                    GUI.Label(new Rect(5f, 195f, 25f, 20f), " Y : ");
+                    location_position_y = GUI.TextField(new Rect(35f, 195f, 140f, 20f), location_position_y, 15);
+                    GUI.Label(new Rect(5f, 220f, 25f, 20f), " Z : ");
+                    location_position_z = GUI.TextField(new Rect(35f, 220f, 140f, 20f), location_position_z, 15);
                     if (GUI.Button(new Rect(50, 260, 100, 30), "Save position"))
                     {
                         teleport.SaveLocation(locationName);
                         locationName = "";
                     }
-                    if (GUI.Button(new Rect(250, 260, 100, 30), "Teleport to position"))
+
+                    //Todo selectionGRID scrollable 
+                    if (GUI.Button(new Rect(230, 260, 120, 30), "Teleport to position"))
                     {
                         teleport.TeleportToLocation(teleport.GetAllLocations()[0]);
                     }
