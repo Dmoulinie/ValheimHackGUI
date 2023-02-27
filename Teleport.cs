@@ -1,6 +1,7 @@
 ﻿
 using System;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 namespace ValheimHackGUI
@@ -48,10 +49,18 @@ namespace ValheimHackGUI
             playerToTeleport.TeleportTo(targetPlayerPosition, targetPlayerRotation, false);
         }
 
-        public void SaveLocation()
+        public void SaveLocation(string name)
         {
             Player localplayer = Player.m_localPlayer;
-            teleportLocations.Add(Tuple.Create(localplayer.transform.position, localplayer.transform.rotation));
+            string myDocumentsFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            string valheimMenuFolder = Path.Combine(myDocumentsFolder, "Valheim_Menu");
+            if (!Directory.Exists(valheimMenuFolder))
+            {
+                Directory.CreateDirectory(valheimMenuFolder);
+            }
+            string filePath = Path.Combine(valheimMenuFolder, "locations.txt");
+            string location = localplayer.transform.position.ToString() + " " + localplayer.transform.rotation.ToString() + " " + name + ";" + Environment.NewLine;
+            File.AppendAllText(filePath, location);
         }
 
         public List<Tuple<Vector3,Quaternion>> GetAllLocations()

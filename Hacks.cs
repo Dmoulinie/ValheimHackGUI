@@ -83,6 +83,7 @@ namespace ValheimHackGUI
         Teleport teleport = new Teleport();
         int chosenPlayer1 = 0;
         int chosenPlayer2 = 0;
+        string locationName = "";
 
 
         //Misc
@@ -291,25 +292,29 @@ namespace ValheimHackGUI
                         allPlayersDict.Add(allPlayersDict.Count, player.GetPlayerID());
                         allPlayersName.Add(player.GetHoverName());
                     }
-                    if (allPlayersInRange.Count <= 0)
+
+                    if (allPlayersName.Count == 0)
                     {
-                        allPlayersName.Clear();
-                        allPlayersName.Add("No Players Found");
+                        GUI.Label(new Rect(180f, 150f, 200, 20), "No players in range");
+                    }   else
+                    {
+
+
+                        chosenPlayer1 = GUI.SelectionGrid(new Rect(5f, 105f, 195f, 190f), chosenPlayer1, allPlayersName.ToArray(), 1); // Toarray() = List<string> -> string[] for GUI.SelectionGrid
+
+                        GUI.Label(new Rect(260, 150, 150, 30), "Selected Player : ");
+                        GUI.Label(new Rect(270, 170, 150, 30), allPlayersName[chosenPlayer1]);
+
+                        if (GUI.Button(new Rect(250, 250, 100, 30), "Teleport"))
+                        {
+                            Player localplayer = Player.m_localPlayer;
+                            long targetPlayerId = 0;
+                            allPlayersDict.TryGetValue(chosenPlayer1, out targetPlayerId);
+                            Player targetPlayer = Player.GetPlayer(targetPlayerId);
+                            teleport.TeleportToPlayer(targetPlayer);
+                        }
                     }
 
-                    chosenPlayer1 = GUI.SelectionGrid(new Rect(5f, 105f, 195f, 190f), chosenPlayer1, allPlayersName.ToArray(), 1); // Toarray() = List<string> -> string[] for GUI.SelectionGrid
-
-                    GUI.Label(new Rect(260, 150, 150, 30), "Selected Player : ");
-                    GUI.Label(new Rect(270, 170, 150, 30), allPlayersName[chosenPlayer1]);
-
-                    if (GUI.Button(new Rect(250, 250, 100, 30), "Teleport"))
-                    {
-                        Player localplayer = Player.m_localPlayer;
-                        long targetPlayerId = 0;
-                        allPlayersDict.TryGetValue(chosenPlayer1, out targetPlayerId);
-                        Player targetPlayer = Player.GetPlayer(targetPlayerId);
-                        teleport.TeleportToPlayer(targetPlayer);
-                    }
                 }
 
                 if (teleportToMeTab)
@@ -329,24 +334,26 @@ namespace ValheimHackGUI
                         allPlayersDict.Add(allPlayersDict.Count, player.GetPlayerID());
                         allPlayersName.Add(player.GetHoverName());
                     }
-                    if (allPlayersInRange.Count <= 0)
+                    if (allPlayersName.Count == 0)
                     {
-                        allPlayersName.Clear();
-                        allPlayersName.Add("No Players Found");
+                        GUI.Label(new Rect(180f, 150f, 200, 20), "No players in range");
                     }
-
-                    chosenPlayer1 = GUI.SelectionGrid(new Rect(5f, 105f, 195f, 190), chosenPlayer1, allPlayersName.ToArray(), 1); // Toarray() = List<string> -> string[] for GUI.SelectionGrid
-
-                    GUI.Label(new Rect(260, 150, 150, 30), "Selected Player : ");
-                    GUI.Label(new Rect(270, 170, 150, 30), allPlayersName[chosenPlayer1]);
-
-                    if (GUI.Button(new Rect(250, 250, 100, 30), "Teleport"))
+                    else
                     {
-                        Player localplayer = Player.m_localPlayer;
-                        long targetPlayerId = 0;
-                        allPlayersDict.TryGetValue(chosenPlayer1, out targetPlayerId);
-                        Player targetPlayer = Player.GetPlayer(targetPlayerId);
-                        teleport.TeleportToMe(targetPlayer);
+
+                        chosenPlayer1 = GUI.SelectionGrid(new Rect(5f, 105f, 195f, 190), chosenPlayer1, allPlayersName.ToArray(), 1); // Toarray() = List<string> -> string[] for GUI.SelectionGrid
+
+                        GUI.Label(new Rect(260, 150, 150, 30), "Selected Player : ");
+                        GUI.Label(new Rect(270, 170, 150, 30), allPlayersName[chosenPlayer1]);
+
+                        if (GUI.Button(new Rect(250, 250, 100, 30), "Teleport"))
+                        {
+                            Player localplayer = Player.m_localPlayer;
+                            long targetPlayerId = 0;
+                            allPlayersDict.TryGetValue(chosenPlayer1, out targetPlayerId);
+                            Player targetPlayer = Player.GetPlayer(targetPlayerId);
+                            teleport.TeleportToMe(targetPlayer);
+                        }
                     }
                 }
 
@@ -367,36 +374,41 @@ namespace ValheimHackGUI
                         allPlayersDict.Add(allPlayersDict.Count, player.GetPlayerID());
                         allPlayersName.Add(player.GetHoverName());
                     }
-                    if (allPlayersInRange.Count <= 0)
+                    if (allPlayersName.Count == 0)
                     {
-                        allPlayersName.Clear();
-                        allPlayersName.Add("No Players Found");
+                        GUI.Label(new Rect(180f, 150f, 200, 20), "No players in range");
                     }
-                    GUI.Label(new Rect(80f, 105f, 195f, 100f), "Player 1");
-                    GUI.Label(new Rect(280f, 105f, 195f, 100f), "Player 2");
-                    chosenPlayer1 = GUI.SelectionGrid(new Rect(5f, 135f, 195f, 100f), chosenPlayer1, allPlayersName.ToArray(), 1); // Toarray() = List<string> -> string[] for GUI.SelectionGrid
-                    chosenPlayer2 = GUI.SelectionGrid(new Rect(200f, 135f, 195f, 100f), chosenPlayer2, allPlayersName.ToArray(), 1); // Toarray() = List<string> -> string[] for GUI.SelectionGrid
-
-                    GUI.Label(new Rect(25, 260, 200, 30), allPlayersName[chosenPlayer1] + " to " + allPlayersName[chosenPlayer2]);
-
-                    if (GUI.Button(new Rect(250, 260, 100, 30), "Teleport"))
+                    else
                     {
-                        Player localplayer = Player.m_localPlayer;
-                        long targetPlayerId1 = 0;
-                        long targetPlayerId2 = 0;
-                        allPlayersDict.TryGetValue(chosenPlayer1, out targetPlayerId1);
-                        allPlayersDict.TryGetValue(chosenPlayer2, out targetPlayerId2);
-                        Player playertoTeleport = Player.GetPlayer(targetPlayerId1);
-                        Player targetPlayer = Player.GetPlayer(targetPlayerId2);
-                        teleport.TeleportPlayerToPlayer(playertoTeleport,targetPlayer);
+                        GUI.Label(new Rect(80f, 105f, 195f, 100f), "Player 1");
+                        GUI.Label(new Rect(280f, 105f, 195f, 100f), "Player 2");
+                        chosenPlayer1 = GUI.SelectionGrid(new Rect(5f, 135f, 195f, 100f), chosenPlayer1, allPlayersName.ToArray(), 1); // Toarray() = List<string> -> string[] for GUI.SelectionGrid
+                        chosenPlayer2 = GUI.SelectionGrid(new Rect(200f, 135f, 195f, 100f), chosenPlayer2, allPlayersName.ToArray(), 1); // Toarray() = List<string> -> string[] for GUI.SelectionGrid
+
+                        GUI.Label(new Rect(25, 260, 200, 30), allPlayersName[chosenPlayer1] + " to " + allPlayersName[chosenPlayer2]);
+
+                        if (GUI.Button(new Rect(250, 260, 100, 30), "Teleport"))
+                        {
+                            Player localplayer = Player.m_localPlayer;
+                            long targetPlayerId1 = 0;
+                            long targetPlayerId2 = 0;
+                            allPlayersDict.TryGetValue(chosenPlayer1, out targetPlayerId1);
+                            allPlayersDict.TryGetValue(chosenPlayer2, out targetPlayerId2);
+                            Player playertoTeleport = Player.GetPlayer(targetPlayerId1);
+                            Player targetPlayer = Player.GetPlayer(targetPlayerId2);
+                            teleport.TeleportPlayerToPlayer(playertoTeleport, targetPlayer);
+                        }
+
                     }
                 }
 
                 if (teleportToLocationTab)
                 {
+                    locationName = GUI.TextField(new Rect(5f, 105f, 195f, 20f), locationName, 25);
                     if (GUI.Button(new Rect(50, 260, 100, 30), "Save position"))
                     {
-                        teleport.SaveLocation();
+                        teleport.SaveLocation(locationName);
+                        locationName = "";
                     }
                     if (GUI.Button(new Rect(250, 260, 100, 30), "Teleport to position"))
                     {
