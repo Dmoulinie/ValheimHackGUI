@@ -41,3 +41,7 @@
 - Misc
   - Hud
     - Disable help keys
+
+
+   <hr />
+   If your game is loading slow inject it after the game loads
