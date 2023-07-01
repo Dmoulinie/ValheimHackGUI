@@ -35,6 +35,8 @@
 	- Load locations from file
   - Players
 	- Teleport to a player
+    	- Teleport a player to me
+       	- Teleport a player to a player
 
 - Misc
   - Hud
